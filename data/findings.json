@@ -1,0 +1,44 @@
+[
+  {
+    "endpoint": "*",
+    "category": "auth",
+    "documented": "Append API key as a query parameter: ?api_key=...",
+    "actual": "API key must be sent in the X-API-Key request header.",
+    "how_found": "Got a 401 Unauthorized with detail: 'send your key in the X-API-Key request header, not as a query parameter'."
+  },
+  {
+    "endpoint": "/auth/login",
+    "category": "auth",
+    "documented": "Returns { \"token\": \"...\", \"expires_in\": 86400 }",
+    "actual": "Returns access_token, refresh_token, and expires_in is 900 (15 minutes).",
+    "how_found": "The login response JSON didn't contain 'token' and failed the initial auth script."
+  },
+  {
+    "endpoint": "/v1/listings",
+    "category": "pagination",
+    "documented": "Pagination uses page and limit (max 200).",
+    "actual": "Pagination uses offset instead of page and the API strictly enforces a maximum limit of 50.",
+    "how_found": "The limit=100 parameter resulted in only 50 records being returned per request."
+  },
+  {
+    "endpoint": "/v1/listings",
+    "category": "completeness",
+    "documented": "Returns active sale listings... Inactive, expired and withdrawn listings are excluded server side",
+    "actual": "The endpoint returns listings where is_live: false.",
+    "how_found": "Found 708 listings with is_live set to false."
+  },
+  {
+    "endpoint": "/v1/projects",
+    "category": "units",
+    "documented": "Money: Indian rupees, integer, everywhere in the API",
+    "actual": "price_min and price_max are floats representing Crores, not integer Rupees.",
+    "how_found": "price_max was 4.54 instead of 45400000."
+  },
+  {
+    "endpoint": "/v1/listing/{id}",
+    "category": "routing",
+    "documented": "GET /v1/listing/{listing_id} is documented, but earlier the docs refer to GET /v1/listings/{listing_id}",
+    "actual": "The endpoint is singular: /v1/listing/{id}. Using plural /v1/listings/{id} returns a 404.",
+    "how_found": "When clicking a listing detail in the frontend, fetch('/v1/listings/...') returned a 404 Not Found error. Changing it to singular fixed it."
+  }
+]
