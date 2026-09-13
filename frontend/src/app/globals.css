@@ -184,6 +184,7 @@
   /* Compact sidebar filter input — pill, smaller height */
   .filter-input {
     width: 100%;
+    box-sizing: border-box;
     height: 38px;
     padding: 0 14px;
     border-radius: var(--radius-pill);
