@@ -21,7 +21,7 @@ export default function ListingDetail() {
       setIsSaved(getSavedListingIds().includes(id as string));
     });
 
-    fetchApi(`/v1/listing/${id}`)
+    fetchApi(`/v1/listings/${id}`)
       .then((l) => setListing(l))
       .catch((e) => setError(e.message || "Failed to load listing."))
       .finally(() => setLoading(false));

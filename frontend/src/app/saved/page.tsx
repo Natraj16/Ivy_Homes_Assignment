@@ -21,7 +21,7 @@ export default function Saved() {
         return;
       }
       const results = await Promise.all(
-        ids.map(id => fetchApi(`/v1/listing/${id}`).catch(() => null))
+        ids.map(id => fetchApi(`/v1/listings/${id}`).catch(() => null))
       );
       setFavourites(results.filter(Boolean));
     } catch (e: any) {
