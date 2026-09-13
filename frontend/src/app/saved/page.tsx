@@ -14,8 +14,16 @@ export default function Saved() {
   const load = async () => {
     setLoading(true);
     try {
-      const data: any = await fetchApi("/v1/favourites");
-      setFavourites(data.results || []);
+      const { getSavedListingIds } = await import('@/lib/favourites');
+      const ids = getSavedListingIds();
+      if (ids.length === 0) {
+        setFavourites([]);
+        return;
+      }
+      const results = await Promise.all(
+        ids.map(id => fetchApi(`/v1/listing/${id}`).catch(() => null))
+      );
+      setFavourites(results.filter(Boolean));
     } catch (e: any) {
       setError(e.message || "Failed to load saved listings.");
     } finally {

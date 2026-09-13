@@ -27,7 +27,11 @@ export default function PropertyCard({
   const [saving, setSaving] = useState(false);
   const canSave = type === "listing";
 
-  useEffect(() => setSaved(isSavedProp), [isSavedProp]);
+  useEffect(() => {
+    import('@/lib/favourites').then(({ getSavedListingIds }) => {
+      setSaved(getSavedListingIds().includes(id) || isSavedProp);
+    });
+  }, [id, isSavedProp]);
 
   const toggleSave = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -37,14 +41,11 @@ export default function PropertyCard({
     const next = !saved;
     setSaved(next);
     try {
+      const { saveListingId, removeListingId } = await import('@/lib/favourites');
       if (!next) {
-        await fetchApi(`/v1/favourites/${id}`, { method: "DELETE" });
+        removeListingId(id);
       } else {
-        await fetchApi("/v1/favourites", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id }),
-        });
+        saveListingId(id);
       }
       onSaveToggle?.(id, next);
     } catch {

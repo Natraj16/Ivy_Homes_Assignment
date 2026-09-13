@@ -15,14 +15,14 @@ export default function ListingDetail() {
 
   useEffect(() => {
     if (!id) return;
-    Promise.all([
-      fetchApi(`/v1/listing/${id}`),
-      fetchApi("/v1/favourites"),
-    ])
-      .then(([l, favs]: [any, any]) => {
-        setListing(l);
-        setIsSaved((favs.results || []).some((f: any) => f.listing_id === id));
-      })
+    
+    // Check saved status synchronously if possible
+    import('@/lib/favourites').then(({ getSavedListingIds }) => {
+      setIsSaved(getSavedListingIds().includes(id as string));
+    });
+
+    fetchApi(`/v1/listing/${id}`)
+      .then((l) => setListing(l))
       .catch((e) => setError(e.message || "Failed to load listing."))
       .finally(() => setLoading(false));
   }, [id]);
@@ -33,14 +33,11 @@ export default function ListingDetail() {
     const next = !isSaved;
     setIsSaved(next);
     try {
+      const { saveListingId, removeListingId } = await import('@/lib/favourites');
       if (!next) {
-        await fetchApi(`/v1/favourites/${id}`, { method: "DELETE" });
+        removeListingId(id as string);
       } else {
-        await fetchApi("/v1/favourites", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id }),
-        });
+        saveListingId(id as string);
       }
     } catch {
       setIsSaved(!next);
