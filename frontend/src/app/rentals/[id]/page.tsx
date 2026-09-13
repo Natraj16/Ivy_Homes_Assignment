@@ -2,96 +2,162 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import { fetchApi } from "@/lib/api";
 
+function FactRow({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="flex justify-between items-baseline py-4 border-b border-[var(--color-border)] last:border-0">
+      <span className="text-body text-[var(--color-muted)]">{label}</span>
+      <span className="text-body-md text-[var(--color-ink)] font-medium text-right max-w-[60%]">{value}</span>
+    </div>
+  );
+}
+
 export default function RentalDetail() {
-  const params = useParams();
+  const { id } = useParams<{ id: string }>();
   const [rental, setRental] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (params.id) {
-      fetchApi(`/v1/rentals/${params.id}`)
-        .then((data) => setRental(data))
-        .catch((err: any) => setError(err.message || "Failed to load rental details"))
-        .finally(() => setLoading(false));
-    }
-  }, [params.id]);
+    if (!id) return;
+    fetchApi(`/v1/rentals/${id}`)
+      .then((data) => setRental(data))
+      .catch((err: any) => setError(err.message || "Failed to load rental details"))
+      .finally(() => setLoading(false));
+  }, [id]);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div style={{ color: 'red' }}>Error: {error}</div>;
-  if (!rental) return <div>Rental not found.</div>;
+  if (loading) return (
+    <div className="max-w-5xl mx-auto animate-pulse space-y-4 py-8">
+      <div className="h-10 bg-[var(--color-border)] rounded-full w-2/3" />
+      <div className="h-72 bg-[var(--color-meadow)] rounded-[var(--radius-card)]" />
+    </div>
+  );
+
+  if (error) return (
+    <div className="py-12 text-center">
+      <p className="text-body-md text-[var(--color-error)] mb-4">{error}</p>
+      <Link href="/rentals" className="text-label-md text-[var(--color-primary)] hover:underline">← Back to rentals</Link>
+    </div>
+  );
+
+  if (!rental) return null;
 
   return (
-    <div className="py-[var(--space-md)]">
-      <div className="flex flex-col gap-6 max-w-5xl mx-auto">
-        <div className="flex justify-between items-start">
+    <div className="max-w-6xl mx-auto py-[var(--sp-24)]">
+      {/* Breadcrumb */}
+      <div className="mb-[var(--sp-32)]">
+        <Link href="/rentals" className="text-label text-[var(--color-primary)] hover:underline flex items-center gap-2">
+          <span>←</span> Back to Rentals
+        </Link>
+      </div>
+
+      <div className="flex flex-col lg:flex-row gap-[var(--sp-48)]">
+        
+        {/* Left Column: Details */}
+        <div className="flex-1 min-w-0 flex flex-col gap-[var(--sp-48)]">
+          
+          {/* Header */}
           <div>
-            <h1 className="text-display text-[#111111]">{rental.title || `${rental.bedroom} BHK in ${rental.locality}`}</h1>
-            <p className="text-body-lg text-[var(--color-secondary)] uppercase mt-2">{rental.property_type} • {rental.apartment_name}</p>
+            <div className="flex gap-2 mb-[var(--sp-16)]">
+              <span className="chip">{rental.property_type || "Rental"}</span>
+              {rental.furnishing && <span className="chip-muted">{rental.furnishing}</span>}
+            </div>
+            <h1 className="text-display text-[var(--color-ink)] mb-[var(--sp-8)]">
+              {rental.title || `${rental.bedroom} BHK for rent in ${rental.locality}`}
+            </h1>
+            <p className="text-heading-sm text-[var(--color-muted)] capitalize">
+              {rental.apartment_name} • {rental.locality}
+            </p>
           </div>
+
+          {/* Description */}
+          {rental.description && (
+            <div>
+              <h2 className="text-heading-sm text-[var(--color-ink)] mb-[var(--sp-16)]">About this property</h2>
+              <div className="card-white shadow-sm leading-relaxed text-body text-[var(--color-body)]">
+                {rental.description}
+              </div>
+            </div>
+          )}
+
+          {/* Key Specifications Grid */}
+          <div>
+            <h2 className="text-heading-sm text-[var(--color-ink)] mb-[var(--sp-16)]">Key Specifications</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-[var(--sp-16)]">
+              <div className="card text-center flex flex-col justify-center gap-1">
+                <p className="text-label-sm text-[var(--color-muted)]">Bedrooms</p>
+                <p className="text-heading text-[var(--color-ink)]">{rental.bedroom || "—"}</p>
+              </div>
+              <div className="card text-center flex flex-col justify-center gap-1">
+                <p className="text-label-sm text-[var(--color-muted)]">Bathrooms</p>
+                <p className="text-heading text-[var(--color-ink)]">{rental.bathroom || "—"}</p>
+              </div>
+              <div className="card text-center flex flex-col justify-center gap-1">
+                <p className="text-label-sm text-[var(--color-muted)]">Floor</p>
+                <p className="text-heading text-[var(--color-ink)]">{rental.floor ? `${rental.floor} / ${rental.total_floors}` : "—"}</p>
+              </div>
+              <div className="card text-center flex flex-col justify-center gap-1">
+                <p className="text-label-sm text-[var(--color-muted)]">Area</p>
+                <p className="text-heading text-[var(--color-ink)]">{rental.carpet_area ? `${rental.carpet_area} sqft` : "—"}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Contact details */}
+          <div>
+            <h2 className="text-heading-sm text-[var(--color-ink)] mb-[var(--sp-16)]">Contact Information</h2>
+            <div className="card-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div>
+                <p className="text-label text-[var(--color-muted)] mb-1">Posted by {rental.posted_by}</p>
+                <p className="text-heading-sm text-[var(--color-ink)]">{rental.posted_by_name || "Owner"}</p>
+              </div>
+              <a href={`tel:${rental.posted_by_contact}`} className="btn-primary whitespace-nowrap">
+                Call {rental.posted_by_contact}
+              </a>
+            </div>
+          </div>
+
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-[var(--space-lg)] mt-[var(--space-sm)]">
-          <div>
-            <h2 className="text-headline-sm mb-[var(--space-sm)]">Description</h2>
-            <p className="text-body-md text-[#111111] bg-white p-[var(--space-md)] rounded-[var(--radius-lg)] border border-[var(--color-tertiary)] shadow-sm">
-              {rental.description || "No description provided by the poster."}
-            </p>
+        {/* Right Column: Financials (Sticky) */}
+        <div className="lg:w-[380px] shrink-0">
+          <div className="card flex flex-col gap-[var(--sp-24)] lg:sticky lg:top-[100px]">
             
-            <h2 className="text-headline-sm mt-[var(--space-lg)] mb-[var(--space-sm)]">Key Specifications</h2>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white p-4 rounded-[var(--radius-md)] border border-[var(--color-tertiary)] shadow-sm">
-                <p className="text-caption text-[var(--color-secondary)]">FURNISHING</p>
-                <p className="text-headline-sm mt-1 capitalize">{rental.furnishing}</p>
-              </div>
-              <div className="bg-white p-4 rounded-[var(--radius-md)] border border-[var(--color-tertiary)] shadow-sm">
-                <p className="text-caption text-[var(--color-secondary)]">BATHROOMS</p>
-                <p className="text-headline-sm mt-1">{rental.bathroom}</p>
-              </div>
-              <div className="bg-white p-4 rounded-[var(--radius-md)] border border-[var(--color-tertiary)] shadow-sm">
-                <p className="text-caption text-[var(--color-secondary)]">POSTED BY</p>
-                <p className="text-headline-sm mt-1 capitalize">{rental.posted_by}</p>
-              </div>
-              <div className="bg-white p-4 rounded-[var(--radius-md)] border border-[var(--color-tertiary)] shadow-sm">
-                <p className="text-caption text-[var(--color-secondary)]">CONTACT</p>
-                <p className="text-headline-sm mt-1">{rental.posted_by_contact}</p>
-              </div>
+            <div className="flex items-center justify-between">
+              <span className="chip">Financials</span>
             </div>
-          </div>
-          
-          <div>
-            {/* The Tinted Container Pattern */}
-            <div className="bg-[#F5F7FF] rounded-[var(--radius-xl)] p-[var(--space-md)]">
-              <span className="chip bg-[#001489] text-white text-[10px] mb-[var(--space-sm)]">FINANCIALS</span>
+
+            <div className="flex flex-col gap-[var(--sp-8)]">
+              <p className="text-label text-[var(--color-muted)]">Monthly Rent</p>
+              <p className="text-display text-[var(--color-primary)]">
+                ₹ {rental.price?.toLocaleString("en-IN")}
+                <span className="text-body-md text-[var(--color-muted)]">/mo</span>
+              </p>
+              <p className="text-caption text-[var(--color-muted)]">Excludes maintenance</p>
+            </div>
+
+            <div className="card-white flex flex-col mt-[var(--sp-8)] p-[var(--sp-16)] gap-[var(--sp-16)]">
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-label text-[var(--color-ink)]">Security Deposit</p>
+                  <p className="text-caption text-[var(--color-muted)]">Refundable</p>
+                </div>
+                <p className="text-heading-sm text-[var(--color-ink)]">₹ {rental.deposit?.toLocaleString("en-IN") || "—"}</p>
+              </div>
               
-              <div className="bg-white rounded-[var(--radius-lg)] p-0 shadow-sm overflow-hidden mt-2">
-                <div className="flex justify-between items-center px-6 py-4 border-b border-[var(--color-tertiary)]">
-                  <div>
-                    <p className="text-label-lg text-[#111111]">Security Deposit</p>
-                    <p className="text-body-sm text-[var(--color-secondary)]">Refundable</p>
-                  </div>
-                  <p className="text-headline-sm text-[#111111]">₹ {rental.deposit.toLocaleString()}</p>
+              <div className="w-full h-px bg-[var(--color-border)]" />
+              
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-label text-[var(--color-ink)]">Maintenance</p>
+                  <p className="text-caption text-[var(--color-muted)]">Monthly fee</p>
                 </div>
-
-                <div className="flex justify-between items-center px-6 py-4 border-b border-[var(--color-tertiary)]">
-                  <div>
-                    <p className="text-label-lg text-[#111111]">Maintenance</p>
-                    <p className="text-body-sm text-[var(--color-secondary)]">Monthly fee</p>
-                  </div>
-                  <p className="text-headline-sm text-[#111111]">₹ {rental.maintenance.toLocaleString()}</p>
-                </div>
-
-                <div className="flex justify-between items-center px-6 py-6 bg-white">
-                  <div>
-                    <p className="text-headline-sm text-[#111111]">Monthly Rent</p>
-                    <p className="text-body-sm text-[var(--color-secondary)]">Excludes maintenance</p>
-                  </div>
-                  <p className="text-headline-lg text-[var(--color-primary)]">₹ {rental.price.toLocaleString()}/mo</p>
-                </div>
+                <p className="text-heading-sm text-[var(--color-ink)]">₹ {rental.maintenance?.toLocaleString("en-IN") || "—"}</p>
               </div>
             </div>
+
           </div>
         </div>
       </div>
