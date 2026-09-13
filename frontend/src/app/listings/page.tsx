@@ -21,7 +21,10 @@ export default function Listings() {
 
   const apiParams: Record<string, string> = {};
   if (filters.locality) apiParams.locality = filters.locality;
-  if (filters.bedrooms) apiParams.bedroom = filters.bedrooms;
+  if (filters.bedrooms) apiParams.bhk = filters.bedrooms;
+  if (filters.minPrice) apiParams.min_price = filters.minPrice;
+  if (filters.maxPrice) apiParams.max_price = filters.maxPrice;
+  if (filters.furnishing) apiParams.furnishing = filters.furnishing;
 
   const { items, loading, error, hasMore, loadMore } = usePaginated<any>("/v1/listings", apiParams);
 

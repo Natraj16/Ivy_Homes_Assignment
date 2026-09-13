@@ -13,6 +13,7 @@ export default function Rentals() {
   const apiParams: Record<string, string> = {};
   if (filters.locality) apiParams.locality = filters.locality;
   if (filters.bedrooms) apiParams.bhk = filters.bedrooms;
+  if (filters.furnishing) apiParams.furnishing = filters.furnishing;
 
   const { items, loading, error, hasMore, loadMore } = usePaginated<any>("/v1/rentals", apiParams);
   const filtered = useMemo(() => items.filter((r) => {
