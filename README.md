@@ -70,7 +70,7 @@ Not every hunch I had about the API being broken turned out to be true. A few of
 
 If I had another 48 hours to polish and expand this application, I would focus on the following:
 
-1. **Interactive Map View:** I would integrate `Leaflet` or `Mapbox` to plot all listings and projects geographically. Users could browse by panning around Bangalore, making the discovery process much more intuitive.
+1. **Interactive Map View:** I would integrate `Leaflet` or `Mapbox` to plot all listings and projects geographically. Users could browse by panning around Gurgaon, making the discovery process much more intuitive.
 2. **Data Visualization on the Insights Page:** Right now, the analytics are displayed as raw stat blocks and tables. I would use a library like `Recharts` or `Chart.js` to create beautiful, interactive bar charts (e.g., average price by locality) and pie charts for furnishing distribution.
 3. **Advanced State Management:** While `localStorage` works great for the assignment's scope, scaling the app would benefit from a tool like `Zustand` or `Redux`. This would allow the "Saved" heart icons to sync instantaneously across multiple browser tabs without requiring manual React context propagation.
 4. **End-to-End Testing:** I would write robust E2E tests using Cypress or Playwright to simulate the entire user journey (Login -> Browse -> Filter -> Save -> View Saved). This would ensure that any future unannounced changes to the API would be caught immediately in CI/CD.
