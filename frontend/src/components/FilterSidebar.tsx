@@ -1,13 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 
 export type Filters = {
-  locality: string;
-  bedrooms: string;
-  minPrice: string;
-  maxPrice: string;
-  propertyType: string;
+  locality?: string;
+  bedrooms?: string;
+  minPrice?: string;
+  maxPrice?: string;
+  propertyType?: string;
+  furnishing?: string;
 };
 
 interface FilterSidebarProps {
@@ -15,6 +16,27 @@ interface FilterSidebarProps {
   onChange: (f: Filters) => void;
   onClear: () => void;
 }
+
+const LOCALITIES = [
+  "sector 65",
+  "dwarka expressway",
+  "golf course road",
+  "sohna road",
+  "sector 49",
+  "mg road",
+  "dlf phase 3",
+  "new gurgaon",
+  "sector 82",
+  "sector 56",
+];
+
+const PROPERTY_TYPES = ["Apartment", "Independent House", "Villa"];
+
+const FURNISHING_OPTIONS = [
+  { value: "unfurnished", label: "Unfurnished" },
+  { value: "semi-furnished", label: "Semi-furnished" },
+  { value: "fully-furnished", label: "Fully-furnished" },
+];
 
 export default function FilterSidebar({ filters, onChange, onClear }: FilterSidebarProps) {
   const set = (key: keyof Filters, val: string) => {
@@ -24,106 +46,132 @@ export default function FilterSidebar({ filters, onChange, onClear }: FilterSide
   const activeCount = Object.values(filters).filter(Boolean).length;
 
   return (
-    <aside className="w-full md:w-[340px] shrink-0 bg-white border border-[#E4E4E7] rounded-2xl p-6 flex flex-col gap-7 md:sticky md:top-24">
-      {/* Map View Button */}
-      <button className="self-start bg-[#171717] hover:bg-black text-white rounded-full px-4 py-2 flex items-center gap-2 text-sm font-medium transition-colors">
-        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-        </svg>
-        Map view
-      </button>
-
-      {/* Apartment / Location */}
-      <div className="flex flex-col gap-3">
-        <label className="text-sm text-[#6B7280]">Apartment / Location</label>
-        <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#9CA3AF" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-          <input
-            type="text"
-            value={filters.locality}
-            onChange={(e) => set("locality", e.target.value)}
-            placeholder="Search upto 3 localities"
-            className="w-full pl-10 pr-4 py-2.5 bg-white border border-[#E4E4E7] rounded-full text-sm text-[#303030] placeholder-[#9CA3AF] focus:outline-none focus:border-[#0018A8]"
-          />
-        </div>
+    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-4 flex flex-wrap gap-3 items-end">
+      {/* Locality */}
+      <div>
+        <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Locality</label>
+        <select
+          value={filters.locality}
+          onChange={(e) => set("locality", e.target.value)}
+          className="rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 px-2 py-1.5 text-sm outline-hidden focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600"
+        >
+          <option value="" className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
+            Any
+          </option>
+          {LOCALITIES.map((loc) => (
+            <option
+              key={loc}
+              value={loc}
+              className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100"
+            >
+              {loc.replace(/\b\w/g, (c) => c.toUpperCase())}
+            </option>
+          ))}
+        </select>
       </div>
 
-      {/* Select BHK */}
-      <div className="flex flex-col gap-3">
-        <label className="text-sm text-[#6B7280]">Select BHK</label>
-        <div className="flex flex-wrap gap-2">
-          {["2", "3", "4"].map((bhk) => {
-            const isSelected = filters.bedrooms === bhk;
-            return (
-              <button
-                key={bhk}
-                onClick={() => set("bedrooms", isSelected ? "" : bhk)}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors border ${
-                  isSelected 
-                    ? "bg-[#0018A8] border-[#0018A8] text-white" 
-                    : "bg-white border-[#E4E4E7] text-[#111827] hover:bg-gray-50"
-                }`}
-              >
-                {bhk} BHK
-              </button>
-            );
-          })}
-        </div>
+      {/* Bedrooms */}
+      <div>
+        <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Bedrooms</label>
+        <select
+          value={filters.bedrooms}
+          onChange={(e) => set("bedrooms", e.target.value)}
+          className="rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 px-2 py-1.5 text-sm outline-hidden focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600"
+        >
+          <option value="" className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
+            Any
+          </option>
+          {["1", "2", "3", "4", "5"].map((b) => (
+            <option
+              key={b}
+              value={b}
+              className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100"
+            >
+              {b} BHK
+            </option>
+          ))}
+        </select>
       </div>
 
-      {/* Budget */}
-      <div className="flex flex-col gap-3">
-        <label className="text-sm text-[#6B7280]">Budget</label>
-        <div className="flex justify-between text-[15px] font-semibold text-[#111827] px-1">
-          <span>₹ 0</span>
-          <span>₹ 5 Cr</span>
-        </div>
-        <div className="px-1 mt-1">
-          {/* Simple range slider for now, visually styled with accent-black */}
-          <input
-            type="range"
-            min="0"
-            max="50000000"
-            step="1000000"
-            value={filters.maxPrice || 50000000}
-            onChange={(e) => set("maxPrice", e.target.value)}
-            className="w-full h-1 bg-[#E4E4E7] rounded-lg appearance-none cursor-pointer accent-[#171717]"
-          />
-        </div>
+      {/* Min Price */}
+      <div>
+        <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Min price</label>
+        <input
+          type="number"
+          value={filters.minPrice}
+          onChange={(e) => set("minPrice", e.target.value)}
+          placeholder="₹"
+          className="w-28 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 px-2 py-1.5 text-sm outline-hidden focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600"
+        />
+      </div>
+
+      {/* Max Price */}
+      <div>
+        <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Max price</label>
+        <input
+          type="number"
+          value={filters.maxPrice}
+          onChange={(e) => set("maxPrice", e.target.value)}
+          placeholder="₹"
+          className="w-28 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 px-2 py-1.5 text-sm outline-hidden focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600"
+        />
+      </div>
+
+      {/* Furnishing */}
+      <div>
+        <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Furnishing</label>
+        <select
+          value={filters.furnishing}
+          onChange={(e) => set("furnishing", e.target.value)}
+          className="rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 px-2 py-1.5 text-sm outline-hidden focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600"
+        >
+          <option value="" className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
+            Any
+          </option>
+          {FURNISHING_OPTIONS.map((f) => (
+            <option
+              key={f.value}
+              value={f.value}
+              className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100"
+            >
+              {f.label}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Property Type */}
-      <div className="flex flex-col gap-3">
-        <label className="text-sm text-[#6B7280]">Property Type</label>
-        <div className="flex flex-wrap gap-2">
-          {["Apartment", "Independent House", "Villa"].map((ptype) => {
-            const isSelected = filters.propertyType === ptype;
-            return (
-              <button
-                key={ptype}
-                onClick={() => set("propertyType", isSelected ? "" : ptype)}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors border ${
-                  isSelected 
-                    ? "bg-[#0018A8] border-[#0018A8] text-white" 
-                    : "bg-white border-[#E4E4E7] text-[#111827] hover:bg-gray-50"
-                }`}
-              >
-                {ptype}
-              </button>
-            );
-          })}
-        </div>
+      <div>
+        <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Property type</label>
+        <select
+          value={filters.propertyType}
+          onChange={(e) => set("propertyType", e.target.value)}
+          className="rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 px-2 py-1.5 text-sm outline-hidden focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600"
+        >
+          <option value="" className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
+            Any
+          </option>
+          {PROPERTY_TYPES.map((t) => (
+            <option
+              key={t}
+              value={t}
+              className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100"
+            >
+              {t}
+            </option>
+          ))}
+        </select>
       </div>
 
+      {/* Clear */}
       {activeCount > 0 && (
-        <button onClick={onClear} className="text-[#0018A8] text-sm font-medium self-start mt-2 hover:underline">
-          Clear all filters
+        <button
+          onClick={onClear}
+          className="text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 underline pb-1 cursor-pointer transition-colors"
+        >
+          Clear filters
         </button>
       )}
-    </aside>
+    </div>
   );
 }
