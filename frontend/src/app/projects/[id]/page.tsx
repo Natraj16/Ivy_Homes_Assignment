@@ -5,6 +5,11 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { fetchApi } from "@/lib/api";
 
+function titleCase(str?: string) {
+  if (!str) return "";
+  return str.replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 export default function ProjectDetail() {
   const { id } = useParams<{ id: string }>();
   const [project, setProject] = useState<any>(null);
@@ -19,138 +24,115 @@ export default function ProjectDetail() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  if (loading) return (
-    <div className="max-w-6xl mx-auto animate-pulse space-y-4 py-8">
-      <div className="h-10 bg-[var(--color-border)] rounded-full w-2/3" />
-      <div className="h-72 bg-[var(--color-meadow)] rounded-[var(--radius-card)]" />
-    </div>
-  );
+  if (loading) {
+    return (
+      <div className="max-w-3xl mx-auto animate-pulse space-y-4 py-8">
+        <div className="h-8 bg-zinc-200 dark:bg-zinc-800 rounded w-2/3" />
+        <div className="h-4 bg-zinc-200 dark:bg-zinc-800 rounded w-1/2" />
+        <div className="h-64 bg-zinc-200 dark:bg-zinc-800 rounded-lg" />
+      </div>
+    );
+  }
 
-  if (error) return (
-    <div className="py-12 text-center">
-      <p className="text-body-md text-[var(--color-error)] mb-4">{error}</p>
-      <Link href="/projects" className="text-label-md text-[var(--color-primary)] hover:underline">← Back to projects</Link>
-    </div>
-  );
+  if (error) {
+    return (
+      <div className="py-12 text-center">
+        <p className="text-sm text-red-600 mb-4">{error}</p>
+        <Link href="/projects" className="text-sm text-zinc-500 hover:text-zinc-900 underline">
+          ← Back to projects
+        </Link>
+      </div>
+    );
+  }
 
   if (!project) return null;
 
+  const locality = titleCase(project.locality || "Gurgaon");
+
   return (
-    <div className="max-w-6xl mx-auto py-[var(--sp-24)]">
-      {/* Breadcrumb */}
-      <div className="mb-[var(--sp-32)]">
-        <Link href="/projects" className="text-label text-[var(--color-primary)] hover:underline flex items-center gap-2">
-          <span>←</span> Back to Projects
-        </Link>
+    <div className="flex flex-col gap-6 max-w-3xl">
+      <Link
+        href="/projects"
+        className="text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+      >
+        ← Back to Projects
+      </Link>
+
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
+          {project.developer_name} {project.apartment_name}
+        </h1>
+        <p className="text-zinc-500 text-sm mt-0.5">{locality}, Gurgaon</p>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-[var(--sp-48)]">
-        
-        {/* Left Column: Details */}
-        <div className="flex-1 min-w-0 flex flex-col gap-[var(--sp-48)]">
-          
-          {/* Header */}
-          <div>
-            <div className="flex gap-2 mb-[var(--sp-16)]">
-              <span className="chip">{project.project_status || "Project"}</span>
-            </div>
-            <h1 className="text-display text-[var(--color-ink)] mb-[var(--sp-8)]">
-              {project.developer_name} {project.apartment_name}
-            </h1>
-            <p className="text-heading-sm text-[var(--color-muted)] capitalize">
-              {project.locality}, Bangalore
-            </p>
-          </div>
+      {/* Badges */}
+      <div className="flex items-center gap-2">
+        <span className="text-xs px-2.5 py-0.5 rounded-full font-medium bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 capitalize">
+          {project.project_status || "Project"}
+        </span>
+      </div>
 
-          {/* Key Specifications Grid */}
-          <div>
-            <h2 className="text-heading-sm text-[var(--color-ink)] mb-[var(--sp-16)]">Key Specifications</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-[var(--sp-16)]">
-              <div className="card text-center flex flex-col justify-center gap-1">
-                <p className="text-label-sm text-[var(--color-muted)]">Launch Date</p>
-                <p className="text-heading text-[var(--color-ink)]">{project.launch_date || "—"}</p>
-              </div>
-              <div className="card text-center flex flex-col justify-center gap-1">
-                <p className="text-label-sm text-[var(--color-muted)]">Possession</p>
-                <p className="text-heading text-[var(--color-ink)]">{project.possession_date || "—"}</p>
-              </div>
-              <div className="card text-center flex flex-col justify-center gap-1">
-                <p className="text-label-sm text-[var(--color-muted)]">RERA</p>
-                <p className="text-heading text-[var(--color-ink)] text-[12px] truncate px-2" title={project.rera_number}>{project.rera_number || "—"}</p>
-              </div>
-              <div className="card text-center flex flex-col justify-center gap-1">
-                <p className="text-label-sm text-[var(--color-muted)]">Project ID</p>
-                <p className="text-heading text-[var(--color-ink)]">{project.project_id || "—"}</p>
-              </div>
-            </div>
-          </div>
+      {/* Price */}
+      {project.price_min && project.price_max ? (
+        <p className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
+          ₹ {Number(project.price_min).toFixed(2)} – {Number(project.price_max).toFixed(2)} Cr
+        </p>
+      ) : null}
 
-          {/* Amenities */}
-          {project.amenities && project.amenities.length > 0 && (
-            <div>
-              <h2 className="text-heading-sm text-[var(--color-ink)] mb-[var(--sp-16)]">Amenities</h2>
-              <div className="flex flex-wrap gap-[var(--sp-12)]">
-                {project.amenities.map((amenity: string, idx: number) => (
-                  <span key={idx} className="chip-muted !px-4 !py-2 !rounded-[var(--radius-pill)]">
-                    {amenity}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
+      {/* Details Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm border border-zinc-200 dark:border-zinc-800 rounded-lg p-4 bg-white dark:bg-zinc-900">
+        <div>
+          <p className="text-zinc-500 text-xs mb-0.5">Total Units</p>
+          <p className="font-medium text-zinc-900 dark:text-zinc-100">
+            {project.total_units?.toLocaleString("en-IN") || "—"}
+          </p>
         </div>
-
-        {/* Right Column: Pricing & Scope (Sticky) */}
-        <div className="lg:w-[380px] shrink-0">
-          <div className="card flex flex-col gap-[var(--sp-24)] lg:sticky lg:top-[100px]">
-            
-            <div className="flex items-center justify-between">
-              <span className="chip">Project Scope</span>
-            </div>
-
-            <div className="flex flex-col gap-[var(--sp-8)]">
-              <p className="text-label text-[var(--color-muted)]">Price Range</p>
-              {project.price_min && project.price_max ? (
-                <>
-                  <p className="text-display text-[var(--color-primary)]">
-                    ₹ {(project.price_min / 10000000).toFixed(2)} Cr
-                  </p>
-                  <p className="text-heading-sm text-[var(--color-muted)]">
-                    to ₹ {(project.price_max / 10000000).toFixed(2)} Cr
-                  </p>
-                </>
-              ) : (
-                <p className="text-display text-[var(--color-primary)]">Price on request</p>
-              )}
-            </div>
-
-            <div className="card-white flex flex-col mt-[var(--sp-8)] p-[var(--sp-16)] gap-[var(--sp-16)]">
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="text-label text-[var(--color-ink)]">Area Range</p>
-                  <p className="text-caption text-[var(--color-muted)]">Min to Max layout sizes</p>
-                </div>
-                <p className="text-heading-sm text-[var(--color-ink)] text-right">
-                  {project.min_area_sqft} - {project.max_area_sqft}<br/>sqft
-                </p>
-              </div>
-              
-              <div className="w-full h-px bg-[var(--color-border)]" />
-              
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="text-label text-[var(--color-ink)]">Inventory</p>
-                  <p className="text-caption text-[var(--color-muted)]">Units / Available</p>
-                </div>
-                <p className="text-heading-sm text-[var(--color-ink)] text-right">
-                  {project.total_units} / {project.total_listings}
-                </p>
-              </div>
-            </div>
-
-          </div>
+        <div>
+          <p className="text-zinc-500 text-xs mb-0.5">Towers / Floors</p>
+          <p className="font-medium text-zinc-900 dark:text-zinc-100">
+            {project.total_towers ? `${project.total_towers} towers, ` : ""}
+            {project.total_floors ? `${project.total_floors} floors` : "—"}
+          </p>
+        </div>
+        <div>
+          <p className="text-zinc-500 text-xs mb-0.5">Area Range</p>
+          <p className="font-medium text-zinc-900 dark:text-zinc-100">
+            {project.min_area_sqft} – {project.max_area_sqft} sqft
+          </p>
+        </div>
+        <div>
+          <p className="text-zinc-500 text-xs mb-0.5">Launch Date</p>
+          <p className="font-medium text-zinc-900 dark:text-zinc-100">{project.launch_date || "—"}</p>
+        </div>
+        <div>
+          <p className="text-zinc-500 text-xs mb-0.5">Possession</p>
+          <p className="font-medium text-zinc-900 dark:text-zinc-100">{project.possession_date || "—"}</p>
+        </div>
+        <div>
+          <p className="text-zinc-500 text-xs mb-0.5">RERA Number</p>
+          <p className="font-medium text-zinc-900 dark:text-zinc-100 text-xs font-mono">
+            {project.rera_number || "—"}
+          </p>
         </div>
       </div>
+
+      {/* Amenities */}
+      {project.amenities && project.amenities.length > 0 && (
+        <div className="flex flex-col gap-2">
+          <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Amenities</h2>
+          <div className="flex flex-wrap gap-2">
+            {project.amenities.map((a: string) => (
+              <span
+                key={a}
+                className="text-xs px-2.5 py-1 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 capitalize"
+              >
+                {a}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

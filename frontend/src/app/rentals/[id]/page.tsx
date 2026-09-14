@@ -5,13 +5,9 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { fetchApi } from "@/lib/api";
 
-function FactRow({ label, value }: { label: string; value: React.ReactNode }) {
-  return (
-    <div className="flex justify-between items-baseline py-4 border-b border-[var(--color-border)] last:border-0">
-      <span className="text-body text-[var(--color-muted)]">{label}</span>
-      <span className="text-body-md text-[var(--color-ink)] font-medium text-right max-w-[60%]">{value}</span>
-    </div>
-  );
+function titleCase(str?: string) {
+  if (!str) return "";
+  return str.replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 export default function RentalDetail() {
@@ -28,138 +24,146 @@ export default function RentalDetail() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  if (loading) return (
-    <div className="max-w-5xl mx-auto animate-pulse space-y-4 py-8">
-      <div className="h-10 bg-[var(--color-border)] rounded-full w-2/3" />
-      <div className="h-72 bg-[var(--color-meadow)] rounded-[var(--radius-card)]" />
-    </div>
-  );
+  if (loading) {
+    return (
+      <div className="max-w-3xl mx-auto animate-pulse space-y-4 py-8">
+        <div className="h-8 bg-zinc-200 dark:bg-zinc-800 rounded w-2/3" />
+        <div className="h-4 bg-zinc-200 dark:bg-zinc-800 rounded w-1/2" />
+        <div className="h-64 bg-zinc-200 dark:bg-zinc-800 rounded-lg" />
+      </div>
+    );
+  }
 
-  if (error) return (
-    <div className="py-12 text-center">
-      <p className="text-body-md text-[var(--color-error)] mb-4">{error}</p>
-      <Link href="/rentals" className="text-label-md text-[var(--color-primary)] hover:underline">← Back to rentals</Link>
-    </div>
-  );
+  if (error) {
+    return (
+      <div className="py-12 text-center">
+        <p className="text-sm text-red-600 mb-4">{error}</p>
+        <Link href="/rentals" className="text-sm text-zinc-500 hover:text-zinc-900 underline">
+          ← Back to rentals
+        </Link>
+      </div>
+    );
+  }
 
   if (!rental) return null;
 
+  const locality = titleCase(rental.locality || "Gurgaon");
+  const aptName = rental.apartment_name || locality;
+  const propType = titleCase(rental.property_type || "Rental");
+
   return (
-    <div className="max-w-6xl mx-auto py-[var(--sp-24)]">
-      {/* Breadcrumb */}
-      <div className="mb-[var(--sp-32)]">
-        <Link href="/rentals" className="text-label text-[var(--color-primary)] hover:underline flex items-center gap-2">
-          <span>←</span> Back to Rentals
-        </Link>
+    <div className="flex flex-col gap-6 max-w-3xl">
+      <Link
+        href="/rentals"
+        className="text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+      >
+        ← Back to Rentals
+      </Link>
+
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
+          {rental.title || `${rental.bedroom} BHK for rent in ${locality}`}
+        </h1>
+        <p className="text-zinc-500 text-sm mt-0.5">
+          {aptName} · {locality} · {rental.bedroom} BHK · {propType}
+        </p>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-[var(--sp-48)]">
-        
-        {/* Left Column: Details */}
-        <div className="flex-1 min-w-0 flex flex-col gap-[var(--sp-48)]">
-          
-          {/* Header */}
-          <div>
-            <div className="flex gap-2 mb-[var(--sp-16)]">
-              <span className="chip">{rental.property_type || "Rental"}</span>
-              {rental.furnishing && <span className="chip-muted">{rental.furnishing}</span>}
-            </div>
-            <h1 className="text-display text-[var(--color-ink)] mb-[var(--sp-8)]">
-              {rental.title || `${rental.bedroom} BHK for rent in ${rental.locality}`}
-            </h1>
-            <p className="text-heading-sm text-[var(--color-muted)] capitalize">
-              {rental.apartment_name} • {rental.locality}
-            </p>
-          </div>
+      {/* Badges */}
+      <div className="flex items-center gap-2">
+        <span className="text-xs px-2.5 py-0.5 rounded-full font-medium bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 capitalize">
+          {rental.property_type || "Rental"}
+        </span>
+        {rental.furnishing && (
+          <span className="text-xs px-2.5 py-0.5 rounded-full font-medium bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 capitalize">
+            {rental.furnishing}
+          </span>
+        )}
+      </div>
 
-          {/* Description */}
-          {rental.description && (
-            <div>
-              <h2 className="text-heading-sm text-[var(--color-ink)] mb-[var(--sp-16)]">About this property</h2>
-              <div className="card-white shadow-sm leading-relaxed text-body text-[var(--color-body)]">
-                {rental.description}
-              </div>
-            </div>
-          )}
+      {/* Price */}
+      <p className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
+        ₹ {rental.price?.toLocaleString("en-IN")}
+        <span className="text-base font-normal text-zinc-500"> / month</span>
+      </p>
 
-          {/* Key Specifications Grid */}
-          <div>
-            <h2 className="text-heading-sm text-[var(--color-ink)] mb-[var(--sp-16)]">Key Specifications</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-[var(--sp-16)]">
-              <div className="card text-center flex flex-col justify-center gap-1">
-                <p className="text-label-sm text-[var(--color-muted)]">Bedrooms</p>
-                <p className="text-heading text-[var(--color-ink)]">{rental.bedroom || "—"}</p>
-              </div>
-              <div className="card text-center flex flex-col justify-center gap-1">
-                <p className="text-label-sm text-[var(--color-muted)]">Bathrooms</p>
-                <p className="text-heading text-[var(--color-ink)]">{rental.bathroom || "—"}</p>
-              </div>
-              <div className="card text-center flex flex-col justify-center gap-1">
-                <p className="text-label-sm text-[var(--color-muted)]">Floor</p>
-                <p className="text-heading text-[var(--color-ink)]">{rental.floor ? `${rental.floor} / ${rental.total_floors}` : "—"}</p>
-              </div>
-              <div className="card text-center flex flex-col justify-center gap-1">
-                <p className="text-label-sm text-[var(--color-muted)]">Area</p>
-                <p className="text-heading text-[var(--color-ink)]">{rental.carpet_area ? `${rental.carpet_area} sqft` : "—"}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Contact details */}
-          <div>
-            <h2 className="text-heading-sm text-[var(--color-ink)] mb-[var(--sp-16)]">Contact Information</h2>
-            <div className="card-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <div>
-                <p className="text-label text-[var(--color-muted)] mb-1">Posted by {rental.posted_by}</p>
-                <p className="text-heading-sm text-[var(--color-ink)]">{rental.posted_by_name || "Owner"}</p>
-              </div>
-              <a href={`tel:${rental.posted_by_contact}`} className="btn-primary whitespace-nowrap">
-                Call {rental.posted_by_contact}
-              </a>
-            </div>
-          </div>
-
+      {/* Details Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm border border-zinc-200 dark:border-zinc-800 rounded-lg p-4 bg-white dark:bg-zinc-900">
+        <div>
+          <p className="text-zinc-500 text-xs mb-0.5">Bedrooms</p>
+          <p className="font-medium text-zinc-900 dark:text-zinc-100">{rental.bedroom || "—"}</p>
         </div>
-
-        {/* Right Column: Financials (Sticky) */}
-        <div className="lg:w-[380px] shrink-0">
-          <div className="card flex flex-col gap-[var(--sp-24)] lg:sticky lg:top-[100px]">
-            
-            <div className="flex items-center justify-between">
-              <span className="chip">Financials</span>
-            </div>
-
-            <div className="flex flex-col gap-[var(--sp-8)]">
-              <p className="text-label text-[var(--color-muted)]">Monthly Rent</p>
-              <p className="text-display text-[var(--color-primary)]">
-                ₹ {rental.price?.toLocaleString("en-IN")}
-                <span className="text-body-md text-[var(--color-muted)]">/mo</span>
-              </p>
-              <p className="text-caption text-[var(--color-muted)]">Excludes maintenance</p>
-            </div>
-
-            <div className="card-white flex flex-col mt-[var(--sp-8)] p-[var(--sp-16)] gap-[var(--sp-16)]">
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="text-label text-[var(--color-ink)]">Security Deposit</p>
-                  <p className="text-caption text-[var(--color-muted)]">Refundable</p>
-                </div>
-                <p className="text-heading-sm text-[var(--color-ink)]">₹ {rental.deposit?.toLocaleString("en-IN") || "—"}</p>
-              </div>
-              
-              <div className="w-full h-px bg-[var(--color-border)]" />
-              
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="text-label text-[var(--color-ink)]">Maintenance</p>
-                  <p className="text-caption text-[var(--color-muted)]">Monthly fee</p>
-                </div>
-                <p className="text-heading-sm text-[var(--color-ink)]">₹ {rental.maintenance?.toLocaleString("en-IN") || "—"}</p>
-              </div>
-            </div>
-
-          </div>
+        <div>
+          <p className="text-zinc-500 text-xs mb-0.5">Bathrooms</p>
+          <p className="font-medium text-zinc-900 dark:text-zinc-100">{rental.bathroom || "—"}</p>
         </div>
+        <div>
+          <p className="text-zinc-500 text-xs mb-0.5">Floor</p>
+          <p className="font-medium text-zinc-900 dark:text-zinc-100">
+            {rental.floor ? `${rental.floor} / ${rental.total_floors}` : "—"}
+          </p>
+        </div>
+        <div>
+          <p className="text-zinc-500 text-xs mb-0.5">Carpet Area</p>
+          <p className="font-medium text-zinc-900 dark:text-zinc-100">
+            {rental.carpet_area ? `${rental.carpet_area} sqft` : "—"}
+          </p>
+        </div>
+        <div>
+          <p className="text-zinc-500 text-xs mb-0.5">Furnishing</p>
+          <p className="font-medium text-zinc-900 dark:text-zinc-100 capitalize">
+            {rental.furnishing || "—"}
+          </p>
+        </div>
+        <div>
+          <p className="text-zinc-500 text-xs mb-0.5">Facing</p>
+          <p className="font-medium text-zinc-900 dark:text-zinc-100 capitalize">
+            {rental.facing_direction || "—"}
+          </p>
+        </div>
+        <div>
+          <p className="text-zinc-500 text-xs mb-0.5">Deposit</p>
+          <p className="font-medium text-zinc-900 dark:text-zinc-100">
+            ₹ {rental.deposit?.toLocaleString("en-IN") || "—"}
+          </p>
+        </div>
+        <div>
+          <p className="text-zinc-500 text-xs mb-0.5">Maintenance</p>
+          <p className="font-medium text-zinc-900 dark:text-zinc-100">
+            ₹ {rental.maintenance?.toLocaleString("en-IN") || "—"}
+          </p>
+        </div>
+      </div>
+
+      {/* Description */}
+      {rental.description && (
+        <div className="flex flex-col gap-2">
+          <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Description</h2>
+          <p className="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed whitespace-pre-line">
+            {rental.description}
+          </p>
+        </div>
+      )}
+
+      {/* Contact Owner */}
+      <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 p-4 bg-zinc-50 dark:bg-zinc-900/60 flex items-center justify-between">
+        <div>
+          <p className="text-xs text-zinc-500">
+            Posted by <span className="capitalize">{rental.posted_by || "Owner"}</span>
+          </p>
+          <p className="font-medium text-sm text-zinc-900 dark:text-zinc-100">
+            {rental.posted_by_name || "Ivy Homes Partner"}
+          </p>
+        </div>
+        {rental.posted_by_contact && (
+          <a
+            href={`tel:${rental.posted_by_contact}`}
+            className="rounded-md bg-zinc-900 text-white dark:bg-zinc-100 dark:text-black px-3 py-1.5 text-xs font-medium hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors"
+          >
+            Contact {rental.posted_by_contact}
+          </a>
+        )}
       </div>
     </div>
   );
