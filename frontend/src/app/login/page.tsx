@@ -27,132 +27,48 @@ export default function Login() {
   };
 
   return (
-    /* Full-viewport centering on canvas bg */
-    <div style={{
-      minHeight: "calc(100vh - 64px)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      padding: "48px 24px",
-      background: "var(--color-canvas)",
-      margin: "-32px -48px",
-    }}>
-      {/*
-        Ditto card pattern:
-        - bg: white (#fff) for the form itself
-        - 24px radius
-        - meadow border
-        - generous padding
-      */}
-      <div style={{
-        width: "100%",
-        maxWidth: "400px",
-        background: "var(--color-white)",
-        borderRadius: "var(--radius-card)",
-        border: "1.5px solid var(--color-border)",
-        padding: "40px",
-      }}>
-        {/* Logo lockup */}
-        <div style={{ marginBottom: "32px" }}>
-          <span style={{ fontFamily: "var(--font-display)", fontSize: "26px", fontWeight: 700, color: "var(--color-primary)", letterSpacing: "-0.02em" }}>Ivy</span>
-          <span style={{ fontFamily: "var(--font-ui)", fontSize: "22px", fontWeight: 400, color: "var(--color-ink)", letterSpacing: "-0.02em" }}>homes</span>
-        </div>
+    <div className="flex flex-1 items-center justify-center py-16">
+      <div className="w-full max-w-sm rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-xs">
+        <h1 className="text-xl font-semibold mb-1">Sign in</h1>
+        <p className="text-sm text-zinc-500 mb-6">Enter your credentials to access your account.</p>
 
-        <h1 style={{ fontSize: "20px", fontWeight: 600, color: "var(--color-ink)", marginBottom: "24px", fontFamily: "var(--font-ui)" }}>
-          Log in
-        </h1>
-
-        {/* Error banner — above form, light red tint */}
         {error && (
-          <div style={{
-            marginBottom: "16px",
-            padding: "10px 14px",
-            background: "#FEF2F2",
-            border: "1px solid #FECACA",
-            borderRadius: "12px",
-          }}>
-            <p style={{ fontSize: "14px", color: "var(--color-error)", fontFamily: "var(--font-ui)" }}>{error}</p>
-          </div>
+          <p className="text-sm text-red-600 bg-red-50 dark:bg-red-950/30 rounded-md px-3 py-2 mb-4">
+            {error}
+          </p>
         )}
 
-        <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-            <label style={{ fontSize: "14px", fontWeight: 600, color: "var(--color-ink)", fontFamily: "var(--font-ui)" }}>
-              Email
-            </label>
-            {/* Pill-shaped input — Ditto signature */}
+        <form onSubmit={handleLogin} className="flex flex-col gap-4">
+          <div>
+            <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
               placeholder="demo1@ivy.homes"
-              style={{
-                width: "100%",
-                height: "44px",
-                padding: "0 18px",
-                borderRadius: "9999px",
-                border: "1.5px solid var(--color-border)",
-                fontSize: "15px",
-                fontFamily: "var(--font-ui)",
-                color: "var(--color-body)",
-                background: "var(--color-canvas)",
-                outline: "none",
-                boxSizing: "border-box",
-              }}
-              onFocus={e => (e.target.style.borderColor = "var(--color-primary)")}
-              onBlur={e => (e.target.style.borderColor = "var(--color-border)")}
+              className="w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 px-3 py-2 text-sm focus:outline-hidden focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600"
             />
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-            <label style={{ fontSize: "14px", fontWeight: 600, color: "var(--color-ink)", fontFamily: "var(--font-ui)" }}>
-              Password
-            </label>
+          <div>
+            <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
               placeholder="••••••••"
-              style={{
-                width: "100%",
-                height: "44px",
-                padding: "0 18px",
-                borderRadius: "9999px",
-                border: "1.5px solid var(--color-border)",
-                fontSize: "15px",
-                fontFamily: "var(--font-ui)",
-                color: "var(--color-body)",
-                background: "var(--color-canvas)",
-                outline: "none",
-                boxSizing: "border-box",
-              }}
-              onFocus={e => (e.target.style.borderColor = "var(--color-primary)")}
-              onBlur={e => (e.target.style.borderColor = "var(--color-border)")}
+              className="w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 px-3 py-2 text-sm focus:outline-hidden focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600"
             />
           </div>
 
-          {/* Pill primary button */}
           <button
             type="submit"
             disabled={loading}
-            style={{
-              marginTop: "8px",
-              width: "100%",
-              height: "44px",
-              borderRadius: "9999px",
-              background: loading ? "var(--color-border)" : "var(--color-primary)",
-              color: "#fff",
-              fontSize: "15px",
-              fontWeight: 600,
-              fontFamily: "var(--font-ui)",
-              border: "none",
-              cursor: loading ? "not-allowed" : "pointer",
-              transition: "background 0.15s ease",
-            }}
+            className="mt-2 rounded-md bg-zinc-900 text-white dark:bg-zinc-100 dark:text-black px-4 py-2 text-sm font-medium hover:bg-zinc-800 dark:hover:bg-zinc-200 disabled:opacity-50 transition-colors"
           >
-            {loading ? "Logging in…" : "Log in"}
+            {loading ? "Signing in…" : "Sign in"}
           </button>
         </form>
       </div>

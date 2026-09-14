@@ -14,14 +14,14 @@ export default function Saved() {
   const load = async () => {
     setLoading(true);
     try {
-      const { getSavedListingIds } = await import('@/lib/favourites');
+      const { getSavedListingIds } = await import("@/lib/favourites");
       const ids = getSavedListingIds();
       if (ids.length === 0) {
         setFavourites([]);
         return;
       }
       const results = await Promise.all(
-        ids.map(id => fetchApi(`/v1/listings/${id}`).catch(() => null))
+        ids.map((id) => fetchApi(`/v1/listings/${id}`).catch(() => null))
       );
       setFavourites(results.filter(Boolean));
     } catch (e: any) {
@@ -31,60 +31,67 @@ export default function Saved() {
     }
   };
 
-  useEffect(() => { load(); }, []);
-  const handleRemove = (id: string) => setFavourites((prev) => prev.filter((f) => f.listing_id !== id));
+  useEffect(() => {
+    load();
+  }, []);
+
+  const handleRemove = (id: string) => {
+    setFavourites((prev) => prev.filter((f) => f.listing_id !== id));
+  };
 
   return (
-    <div className="flex flex-col gap-6 py-4">
+    <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-display text-[var(--color-ink)]">Saved Listings</h1>
+        <h1 className="text-2xl font-semibold">Saved Listings</h1>
         {!loading && (
-          <p className="text-body-md text-[var(--color-muted)] mt-1">
+          <p className="text-sm text-zinc-500">
             {favourites.length} saved {favourites.length === 1 ? "listing" : "listings"}
           </p>
         )}
       </div>
 
       {error && (
-        <div className="bg-[#FEF2F2] border border-[#FECACA] rounded-[var(--radius-sm)] p-4">
-          <p className="text-body-sm text-[var(--color-error)]">{error}</p>
-        </div>
+        <p className="text-sm text-red-600 bg-red-50 dark:bg-red-950/30 rounded-md px-3 py-2">
+          {error}
+        </p>
       )}
 
       {loading ? (
         <CardSkeletonGrid count={6} />
       ) : favourites.length === 0 ? (
-        /* Empty state */
-        <div className="py-20 px-6 flex flex-col items-center gap-4 text-center">
-          <div className="w-14 h-14 rounded-full bg-[var(--color-meadow)] flex items-center justify-center">
-            <svg width="24" height="24" fill="none" stroke="var(--color-muted)" viewBox="0 0 24 24" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round"
-                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-            </svg>
-          </div>
-          <p className="text-body-md text-[var(--color-muted)]">You haven't saved any listings yet.</p>
-          <Link href="/listings" className="btn-primary">
+        <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 p-8 text-center flex flex-col items-center gap-3">
+          <p className="text-sm text-zinc-500">You haven't saved any listings yet.</p>
+          <Link
+            href="/listings"
+            className="rounded-md bg-zinc-900 text-white dark:bg-zinc-100 dark:text-black px-4 py-2 text-sm font-medium hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors"
+          >
             Browse listings
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {favourites.map((item) => (
-            <PropertyCard
-              key={item.listing_id}
-              id={item.listing_id}
-              type="listing"
-              title={`${item.bedroom} BHK ${item.property_type || "Apartment"} · ${item.apartment_name || item.locality}`}
-              locality={item.locality || "Bangalore"}
-              price={`₹ ${(item.price / 10000000).toFixed(2)} Cr`}
-              beds={item.bedroom}
-              baths={item.bathroom}
-              area={`${item.carpet_area} sqft`}
-              isVerified={item.is_verified}
-              isSaved={true}
-              onSaveToggle={(id, saved) => { if (!saved) handleRemove(id); }}
-            />
-          ))}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {favourites.map((item) => {
+            const propType = (item.property_type || "Apartment").replace(/\b\w/g, (c: string) => c.toUpperCase());
+            const aptName = item.apartment_name || (item.locality ? item.locality.replace(/\b\w/g, (c: string) => c.toUpperCase()) : "Gurgaon");
+            return (
+              <PropertyCard
+                key={item.listing_id}
+                id={item.listing_id}
+                type="listing"
+                title={`${item.bedroom} BHK ${propType} · ${aptName}`}
+                locality={item.locality || "Gurgaon"}
+                price={`₹ ${(item.price / 10000000).toFixed(2)} Cr`}
+                beds={item.bedroom}
+                baths={item.bathroom}
+                area={item.carpet_area}
+                isVerified={item.is_verified}
+                isSaved={true}
+                onSaveToggle={(id, saved) => {
+                  if (!saved) handleRemove(id);
+                }}
+              />
+            );
+          })}
         </div>
       )}
     </div>
