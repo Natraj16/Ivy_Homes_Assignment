@@ -26,7 +26,7 @@ export default function Navbar() {
       try {
         const user = JSON.parse(localStorage.getItem("ivy_user") || "{}");
         setUserEmail(user.email || "");
-      } catch {}
+      } catch { }
     }
   }, [pathname]);
 
@@ -36,105 +36,64 @@ export default function Navbar() {
   };
 
   return (
-    /* Ditto pattern: nav sits on --color-meadow, no shadow */
-    <header className="sticky top-0 z-50" style={{ background: "var(--color-meadow)" }}>
-      <div
-        style={{
-          maxWidth: "1200px",
-          margin: "0 auto",
-          padding: "0 48px",
-          height: "64px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: "24px",
-          borderBottom: "1.5px solid var(--color-border)",
-        }}
-      >
-        {/* Logo — always links to listings */}
-        <Link href="/listings" style={{ display: "flex", alignItems: "baseline", gap: "1px", textDecoration: "none" }}>
-          <span style={{ fontFamily: "var(--font-display)", fontSize: "22px", fontWeight: 700, color: "var(--color-primary)", letterSpacing: "-0.02em", lineHeight: 1 }}>Ivy</span>
-          <span style={{ fontFamily: "var(--font-ui)", fontSize: "20px", fontWeight: 400, color: "var(--color-ink)", letterSpacing: "-0.02em", lineHeight: 1 }}>homes</span>
+    <header className="sticky top-0 z-10 bg-white dark:bg-black border-b border-zinc-200 dark:border-zinc-800">
+      <nav className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
+        {/* Brand */}
+        <Link href="/" className="font-semibold text-lg tracking-tight">
+          Ivy Homes
         </Link>
 
-        {/* Center nav — only when authenticated */}
-        {isAuth && (
-          <nav style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-            {NAV_LINKS.map(({ href, label }) => {
-              const active = pathname.startsWith(href);
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  style={{
-                    padding: "6px 16px",
-                    borderRadius: "9999px",
-                    fontSize: "14px",
-                    fontWeight: 500,
-                    fontFamily: "var(--font-ui)",
-                    letterSpacing: "-0.01em",
-                    textDecoration: "none",
-                    transition: "all 0.15s ease",
-                    background: active ? "var(--color-primary)" : "transparent",
-                    color: active ? "#fff" : "var(--color-ink)",
-                  }}
-                >
-                  {label}
-                </Link>
-              );
-            })}
-          </nav>
-        )}
-
-        {/* Right: email + logout / login */}
-        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          {isAuth ? (
+        {/* Nav links + auth */}
+        <div className="flex items-center gap-1 sm:gap-4 text-sm">
+          {isAuth && (
             <>
+              {NAV_LINKS.map(({ href, label }) => {
+                const active = pathname?.startsWith(href);
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    className={`px-2 py-1 rounded-md transition-colors ${
+                      active
+                        ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-black"
+                        : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+                    }`}
+                  >
+                    {label}
+                  </Link>
+                );
+              })}
+
+              {/* Divider */}
+              <div className="hidden sm:block w-px h-5 bg-zinc-200 dark:bg-zinc-700 mx-1" />
+
+              {/* Email */}
               {userEmail && (
-                <span style={{ fontSize: "13px", color: "var(--color-muted)", fontFamily: "var(--font-ui)", maxWidth: "200px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                <span className="hidden sm:inline text-xs text-zinc-500 max-w-[160px] truncate">
                   {userEmail}
                 </span>
               )}
+
+              {/* Logout */}
               <button
                 onClick={handleLogout}
-                style={{
-                  height: "36px",
-                  padding: "0 18px",
-                  borderRadius: "9999px",
-                  border: "1.5px solid var(--color-border-strong)",
-                  background: "transparent",
-                  color: "var(--color-ink)",
-                  fontSize: "14px",
-                  fontWeight: 500,
-                  fontFamily: "var(--font-ui)",
-                  cursor: "pointer",
-                }}
+                className="border border-zinc-300 dark:border-zinc-700 rounded-md px-3 py-1.5 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
               >
                 Log out
               </button>
             </>
-          ) : pathname !== "/login" ? (
+          )}
+
+          {!isAuth && pathname !== "/login" && (
             <Link
               href="/login"
-              style={{
-                height: "36px",
-                padding: "0 18px",
-                borderRadius: "9999px",
-                background: "var(--color-primary)",
-                color: "#fff",
-                fontSize: "14px",
-                fontWeight: 600,
-                fontFamily: "var(--font-ui)",
-                textDecoration: "none",
-                display: "flex",
-                alignItems: "center",
-              }}
+              className="bg-zinc-900 text-white dark:bg-zinc-100 dark:text-black rounded-md px-3 py-1.5 text-sm font-medium hover:opacity-90 transition-opacity"
             >
               Log in
             </Link>
-          ) : null}
+          )}
         </div>
-      </div>
+      </nav>
     </header>
   );
 }
