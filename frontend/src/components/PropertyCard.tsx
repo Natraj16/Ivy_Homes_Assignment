@@ -59,7 +59,7 @@ export default function PropertyCard({
       <article className="bg-white border border-[#E4E4E7] rounded-[20px] overflow-hidden flex flex-col h-full transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
         
         {/* Image Area */}
-        <div className="relative aspect-[4/3] bg-[#F4F6FF] shrink-0">
+        <div className="relative aspect-video bg-[#F4F6FF] shrink-0">
           {/* House icon placeholder */}
           <div className="absolute inset-0 flex items-center justify-center">
             <svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="#D1D5DB" strokeWidth={1}>
@@ -69,13 +69,13 @@ export default function PropertyCard({
           </div>
 
           {/* Badges Overlay */}
-          <div className="absolute top-3 right-3 flex items-center gap-2">
+          <div className="absolute top-3 left-3 flex items-center gap-2">
             {isVerified && (
               <span className="bg-[#0018A8] text-white text-[10px] font-bold tracking-wide px-3 py-1 rounded-full">
                 Ivy Signature
               </span>
             )}
-            <span className="bg-white text-[#EA580C] text-[10px] font-bold tracking-wide px-3 py-1 rounded-full">
+            <span className="bg-[#FDEEDD] text-[#B4530E] text-[10px] font-bold tracking-wide px-3 py-1 rounded-full">
               Coming Soon
             </span>
           </div>
@@ -85,35 +85,35 @@ export default function PropertyCard({
         <div className="p-4 flex flex-col flex-1">
           {/* Title & Price Row */}
           <div className="flex justify-between items-start gap-4 mb-1">
-            <h3 className="font-semibold text-[#111827] text-[15px] leading-snug line-clamp-1">{title}</h3>
+            <h3 className="font-semibold text-[#111827] text-[15px] leading-snug truncate">{title}</h3>
             <span className="font-semibold text-[#111827] text-[15px] whitespace-nowrap">{price}</span>
           </div>
           
           {/* Locality */}
-          <p className="text-[#6B7280] text-[13px] mb-4">{locality}</p>
+          <p className="text-[#6B7280] text-[13px] mb-4 truncate">{locality}</p>
 
           <div className="mt-auto pt-2 flex items-center justify-between">
             {/* Features Row */}
-            <div className="flex items-center gap-2 text-[#6B7280] text-xs">
+            <div className="flex items-center gap-2 text-[#111827] text-[11px] font-medium">
               {beds && (
-                <div className="flex items-center gap-1.5 border border-[#E5E7EB] rounded-md px-2 py-1">
-                  <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="flex items-center gap-1.5 border border-[#E4E4E7] rounded-full px-2.5 py-1">
+                  <svg width="12" height="12" fill="none" stroke="#6B7280" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                   </svg>
                   <span>{beds}</span>
                 </div>
               )}
               {area && (
-                <div className="flex items-center gap-1.5 border border-[#E5E7EB] rounded-md px-2 py-1">
-                  <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="flex items-center gap-1.5 border border-[#E4E4E7] rounded-full px-2.5 py-1">
+                  <svg width="12" height="12" fill="none" stroke="#6B7280" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
                   </svg>
                   <span>{area} sq. ft.</span>
                 </div>
               )}
               {baths && (
-                <div className="flex items-center gap-1.5 border border-[#E5E7EB] rounded-md px-2 py-1">
-                  <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="flex items-center gap-1.5 border border-[#E4E4E7] rounded-full px-2.5 py-1">
+                  <svg width="12" height="12" fill="none" stroke="#6B7280" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
                   </svg>
                   <span>{baths} Bath</span>

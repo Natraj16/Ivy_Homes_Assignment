@@ -46,60 +46,58 @@ export function usePaginated<T>(path: string, params: Record<string, string> = {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [offset, setOffset] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(1);
+  const limit = 20;
 
   // We stringify params to use as dependency array
   const paramsString = JSON.stringify(params);
 
   useEffect(() => {
-    // Reset state when path or params change
-    setItems([]);
-    setOffset(0);
-    setHasMore(true);
-    setTotal(0);
-    fetchPage(0, true);
+    // Reset page to 1 when filters change
+    setPage(1);
   }, [path, paramsString]);
 
-  const fetchPage = async (currentOffset: number, reset: boolean = false) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const queryParams = JSON.parse(paramsString);
-      const limit = 50;
-      
-      const query = new URLSearchParams({
-        ...queryParams,
-        offset: currentOffset.toString(),
-        limit: limit.toString()
-      });
+  useEffect(() => {
+    let active = true;
 
-      const url = `${path}?${query.toString()}`;
-      const data = await fetchApi<PaginatedResponse<T>>(url);
-
-      if (data.results) {
-        setItems(prev => reset ? data.results : [...prev, ...data.results]);
-        setTotal(data.total);
-        setOffset(currentOffset + data.results.length);
+    const fetchPage = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const queryParams = JSON.parse(paramsString);
         
-        if (data.results.length < limit || currentOffset + data.results.length >= data.total) {
-          setHasMore(false);
+        // Since the actual API uses 'offset' instead of 'page', we calculate it.
+        const offset = (page - 1) * limit;
+        
+        const query = new URLSearchParams({
+          ...queryParams,
+          offset: offset.toString(),
+          limit: limit.toString()
+        });
+
+        const url = `${path}?${query.toString()}`;
+        const data = await fetchApi<PaginatedResponse<T>>(url);
+
+        if (active) {
+          if (data.results) {
+            setItems(data.results);
+            setTotal(data.total);
+          } else {
+            setItems([]);
+            setTotal(0);
+          }
         }
-      } else {
-        setHasMore(false);
+      } catch (err: any) {
+        if (active) setError(err.message || 'Failed to load data');
+      } finally {
+        if (active) setLoading(false);
       }
-    } catch (err: any) {
-      setError(err.message || 'Failed to load data');
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  const loadMore = () => {
-    if (!loading && hasMore) {
-      fetchPage(offset);
-    }
-  };
+    fetchPage();
 
-  return { items, total, loading, error, hasMore, loadMore };
+    return () => { active = false; };
+  }, [path, paramsString, page]);
+
+  return { items, total, loading, error, page, setPage, limit };
 }
