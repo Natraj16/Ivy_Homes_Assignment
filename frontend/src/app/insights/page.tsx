@@ -40,14 +40,17 @@ export default function Insights() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    Promise.all([
-      fetchApi("/v1/analytics/summary").catch((e) => { setError(e.message); return null; }),
-      fetch("/api/local-data").then((r) => r.json()).catch(() => ({})),
-    ]).then(([s, local]) => {
-      if (s) setSummary(s);
-      setLocalData(local || {});
-      setLoading(false);
-    });
+    fetch("/api/local-data")
+      .then((r) => r.json())
+      .then((local) => {
+        setLocalData(local || {});
+        if (local?.analytics) setSummary(local.analytics);
+        setLoading(false);
+      })
+      .catch((e) => {
+        setError("Failed to load local data.");
+        setLoading(false);
+      });
   }, []);
 
   // Normalise findings into an array of objects we can render as a table
@@ -84,7 +87,7 @@ export default function Insights() {
 
       {error && (
         <div className="px-4 py-3 rounded bg-red-50 border border-red-200">
-          <p className="text-body-sm text-[#D92D20]">Could not load summary: {error}</p>
+          <p className="text-body-sm text-[#D92D20]">{error}</p>
         </div>
       )}
 
@@ -101,45 +104,68 @@ export default function Insights() {
                 <><StatBlock value={`₹ ${(summary.median_price / 10000000).toFixed(2)} Cr`} label="Median price" /><Divider /></>
               )}
               {summary.median_price_per_sqft != null && (
-                <StatBlock value={`₹ ${summary.median_price_per_sqft.toLocaleString()}`} label="Median ₹/sqft" />
+                <StatBlock value={`₹ ${Math.round(summary.median_price_per_sqft).toLocaleString()}`} label="Median ₹/sqft" />
               )}
             </div>
 
-            {/* By-bedroom breakdown */}
-            {summary.by_bedroom && Object.keys(summary.by_bedroom).length > 0 && (
-              <div className="mt-6 pt-5 border-t border-[#E4E4E7]">
-                <p className="text-label-md text-[#666] mb-3">By bedrooms</p>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-body-sm">
-                    <thead>
-                      <tr className="border-b border-[#E4E4E7]">
-                        <th className="pb-2 text-label-md text-[#666] font-semibold pr-6">BHK</th>
-                        <th className="pb-2 text-label-md text-[#666] font-semibold pr-6">Count</th>
-                        <th className="pb-2 text-label-md text-[#666] font-semibold pr-6">Median price</th>
-                        <th className="pb-2 text-label-md text-[#666] font-semibold">Median ₹/sqft</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {Object.entries(summary.by_bedroom).map(([bhk, stats]: [string, any]) => (
-                        <tr key={bhk} className="border-b border-[#E4E4E7] last:border-0">
-                          <td className="py-2.5 pr-6 text-[#303030]">{bhk} BHK</td>
-                          <td className="py-2.5 pr-6 text-[#303030]">{stats.count?.toLocaleString() ?? "—"}</td>
-                          <td className="py-2.5 pr-6 text-[#303030]">
-                            {stats.median_price ? `₹ ${(stats.median_price / 10000000).toFixed(2)} Cr` : "—"}
-                          </td>
-                          <td className="py-2.5 text-[#303030]">
-                            {stats.median_price_per_sqft ? `₹ ${stats.median_price_per_sqft.toLocaleString()}` : "—"}
-                          </td>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6 pt-5 border-t border-[#E4E4E7]">
+              {/* By-locality breakdown */}
+              {summary.by_locality && summary.by_locality.length > 0 && (
+                <div>
+                  <p className="text-label-md text-[#666] mb-3">By locality</p>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-body-sm">
+                      <thead>
+                        <tr className="border-b border-[#E4E4E7]">
+                          <th className="pb-2 text-label-md text-[#666] font-semibold pr-6">Locality</th>
+                          <th className="pb-2 text-label-md text-[#666] font-semibold pr-6">Count</th>
+                          <th className="pb-2 text-label-md text-[#666] font-semibold">Median price</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {summary.by_locality.slice(0, 10).map((loc: any) => (
+                          <tr key={loc.locality} className="border-b border-[#E4E4E7] last:border-0">
+                            <td className="py-2.5 pr-6 text-[#303030] capitalize">{loc.locality}</td>
+                            <td className="py-2.5 pr-6 text-[#303030]">{loc.count.toLocaleString()}</td>
+                            <td className="py-2.5 text-[#303030]">
+                              {loc.median_price ? `₹ ${(loc.median_price / 10000000).toFixed(2)} Cr` : "—"}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+
+              {/* By-bedroom breakdown */}
+              {summary.by_bhk && summary.by_bhk.length > 0 && (
+                <div>
+                  <p className="text-label-md text-[#666] mb-3">By bedrooms</p>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-body-sm">
+                      <thead>
+                        <tr className="border-b border-[#E4E4E7]">
+                          <th className="pb-2 text-label-md text-[#666] font-semibold pr-6">BHK</th>
+                          <th className="pb-2 text-label-md text-[#666] font-semibold">Count</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {summary.by_bhk.map((stats: any) => (
+                          <tr key={stats.bedroom} className="border-b border-[#E4E4E7] last:border-0">
+                            <td className="py-2.5 pr-6 text-[#303030]">{stats.bedroom} BHK</td>
+                            <td className="py-2.5 text-[#303030]">{stats.count.toLocaleString()}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         ) : (
-          <p className="text-body-md text-[#666]">No summary data available from the API.</p>
+          <p className="text-body-md text-[#666]">No summary data available.</p>
         )}
       </section>
 

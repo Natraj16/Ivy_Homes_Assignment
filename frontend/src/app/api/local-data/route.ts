@@ -7,6 +7,7 @@ export async function GET() {
     const dataDir = path.join(process.cwd(), '..', 'data');
     const answersPath = path.join(dataDir, 'answers.json');
     const findingsPath = path.join(dataDir, 'findings.json');
+    const analyticsPath = path.join(dataDir, 'analytics.json');
 
     const readJson = (filePath: string) => {
       try {
@@ -21,7 +22,8 @@ export async function GET() {
 
     return NextResponse.json({
       answers: readJson(answersPath) || {},
-      findings: readJson(findingsPath) || {}
+      findings: readJson(findingsPath) || {},
+      analytics: readJson(analyticsPath) || {}
     });
   } catch (error) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

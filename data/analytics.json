@@ -1,0 +1,84 @@
+{
+  "city": "bangalore",
+  "total_listings": 3500,
+  "median_price": 14735000.0,
+  "median_price_per_sqft": 14540.95411028105,
+  "by_locality": [
+    {
+      "locality": "sector 65",
+      "count": 385,
+      "median_price": 16110000.0
+    },
+    {
+      "locality": "dwarka expressway",
+      "count": 373,
+      "median_price": 14450000.0
+    },
+    {
+      "locality": "golf course road",
+      "count": 365,
+      "median_price": 14590000.0
+    },
+    {
+      "locality": "sohna road",
+      "count": 359,
+      "median_price": 14440000.0
+    },
+    {
+      "locality": "sector 49",
+      "count": 355,
+      "median_price": 14730000.0
+    },
+    {
+      "locality": "mg road",
+      "count": 353,
+      "median_price": 14490000.0
+    },
+    {
+      "locality": "dlf phase 3",
+      "count": 346,
+      "median_price": 14500000.0
+    },
+    {
+      "locality": "new gurgaon",
+      "count": 329,
+      "median_price": 15110000.0
+    },
+    {
+      "locality": "sector 82",
+      "count": 319,
+      "median_price": 15320000.0
+    },
+    {
+      "locality": "sector 56",
+      "count": 310,
+      "median_price": 14825000.0
+    }
+  ],
+  "by_bhk": [
+    {
+      "bedroom": 0,
+      "count": 109
+    },
+    {
+      "bedroom": 1,
+      "count": 279
+    },
+    {
+      "bedroom": 2,
+      "count": 1150
+    },
+    {
+      "bedroom": 3,
+      "count": 1297
+    },
+    {
+      "bedroom": 4,
+      "count": 490
+    },
+    {
+      "bedroom": 5,
+      "count": 175
+    }
+  ]
+}
