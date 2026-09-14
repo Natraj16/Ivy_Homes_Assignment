@@ -6,7 +6,7 @@ import PropertyCard from "@/components/PropertyCard";
 import { CardSkeletonGrid } from "@/components/LoadingSkeleton";
 import FilterSidebar, { Filters } from "@/components/FilterSidebar";
 
-const INIT: Filters = { locality: "", bedrooms: "", minPrice: "", maxPrice: "", propertyType: "" };
+const INIT: Filters = { locality: "", bedrooms: "", minPrice: "", maxPrice: "", propertyType: "", furnishing: "" };
 
 export default function Projects() {
   const [filters, setFilters] = useState<Filters>(INIT);
@@ -15,57 +15,52 @@ export default function Projects() {
   if (filters.maxPrice) apiParams.max_price = filters.maxPrice;
   if (filters.propertyType) apiParams.property_type = filters.propertyType;
 
-  const { items: filtered, loading, error, page, setPage, limit, total } = usePaginated<any>("/v1/projects", apiParams);
-
-  const activeCount = Object.values(filters).filter(Boolean).length;
-  const set = (k: keyof Filters) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-    setFilters((f) => ({ ...f, [k]: e.target.value }));
+  const { items, loading, error, hasMore, loadMore } = usePaginated<any>("/v1/projects", apiParams);
+  const filtered = useMemo(() => items.filter((p) => {
+    if (filters.minPrice && (p.price_min || 0) < parseInt(filters.minPrice)) return false;
+    if (filters.maxPrice && (p.price_max || 0) > parseInt(filters.maxPrice)) return false;
+    if (filters.propertyType && p.property_type?.toLowerCase() !== filters.propertyType.toLowerCase()) return false;
+    return true;
+  }), [items, filters]);
 
   return (
-    <div className="flex flex-col md:flex-row gap-7 items-start">
+    <div className="flex flex-col gap-6">
+      <div>
+        <h1 className="text-2xl font-semibold">Projects</h1>
+        <p className="text-sm text-zinc-500">
+          {items.length} total loaded · {filtered.length} shown after filters
+        </p>
+      </div>
+
       <FilterSidebar filters={filters} onChange={setFilters} onClear={() => setFilters(INIT)} />
 
-      <div className="flex-1 min-w-0 flex flex-col gap-6 mt-1">
-        <div>
-          <h1 className="text-[28px] font-semibold text-[#111827]">Projects in Bangalore</h1>
-          {!loading && <p className="text-body-md text-[var(--color-muted)] mt-1">{filtered.length} {filtered.length === 1 ? "project" : "projects"} in Bangalore</p>}
+      {error && (
+        <p className="text-sm text-red-600 bg-red-50 dark:bg-red-950/30 rounded-md px-3 py-2">{error}</p>
+      )}
+
+      {loading && items.length === 0 ? (
+        <CardSkeletonGrid />
+      ) : filtered.length === 0 ? (
+        <p className="text-sm text-zinc-500 py-12 text-center">No projects match your filters.</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filtered.map((p) => (
+            <PropertyCard key={p.project_id} id={p.project_id} type="project"
+              title={`${p.developer_name || ""} ${p.apartment_name || ""}`.trim()}
+              locality={p.locality || "Gurgaon"}
+              price={p.price_min ? `₹ ${Number(p.price_min).toFixed(2)} – ${Number(p.price_max).toFixed(2)} Cr` : "Price on request"}
+              beds="" baths="" area={p.total_units ? `${p.total_units} units` : ""} />
+          ))}
         </div>
-        {error && <div className="p-4 bg-[#FEF2F2] border border-[#FECACA] rounded-[var(--radius-sm)]"><p className="text-body-sm text-[var(--color-error)]">{error}</p></div>}
-        {loading && filtered.length === 0 ? <CardSkeletonGrid /> : filtered.length === 0 ? (
-          <div className="py-20 px-6 text-center"><p className="text-[15px] text-[var(--color-muted)]">No projects match your filters.</p></div>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {filtered.map((p) => (
-                <PropertyCard key={p.project_id} id={p.project_id} type="project"
-                  title={`${p.developer_name || ""} ${p.apartment_name || ""}`.trim()}
-                  locality={p.locality || "Bangalore"}
-                  price={p.price_min ? `₹ ${Number(p.price_min).toFixed(2)} – ${Number(p.price_max).toFixed(2)} Cr` : "Price on request"}
-                  beds="" baths="" area={p.total_units ? `${p.total_units} units` : ""} />
-              ))}
-            </div>
-            {total > limit && (
-              <div className="flex items-center justify-center gap-4 mt-8 pt-4 border-t border-[#E4E4E7]">
-                <button 
-                  disabled={page === 1} 
-                  onClick={() => setPage(page - 1)} 
-                  className="px-4 py-2 bg-white border border-[#E4E4E7] rounded-full text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Previous
-                </button>
-                <span className="text-sm text-[#666]">
-                  Page <span className="font-semibold text-[#111827]">{page}</span> of {Math.ceil(total / limit)}
-                </span>
-                <button 
-                  disabled={page >= Math.ceil(total / limit)} 
-                  onClick={() => setPage(page + 1)} 
-                  className="px-4 py-2 bg-white border border-[#E4E4E7] rounded-full text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Next
-                </button>
-              </div>
-            )}
-          </>
+      )}
+
+      <div className="h-10 flex items-center justify-center">
+        {loading && items.length > 0 && <span className="text-sm text-zinc-500">Loading more…</span>}
+        {!loading && hasMore && (
+          <button onClick={loadMore} className="text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 underline">Load more</button>
+        )}
+        {!loading && !hasMore && items.length > 0 && (
+          <span className="text-sm text-zinc-400">End of results ({items.length} items loaded)</span>
         )}
       </div>
     </div>
