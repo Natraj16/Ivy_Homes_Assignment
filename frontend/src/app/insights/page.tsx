@@ -169,68 +169,36 @@ export default function Insights() {
         )}
       </section>
 
-      {/* Section B: What we found */}
+      {/* Section B: Data Discoveries */}
       <section className="flex flex-col gap-4">
-        <h2 className="text-headline-sm text-[#303030]">What we found</h2>
-        <p className="text-body-sm text-[#666]">Discrepancies between the API documentation and actual behaviour.</p>
+        <h2 className="text-headline-sm text-[#303030]">Data discoveries</h2>
+        <p className="text-body-sm text-[#666]">Additional insights and anomalies discovered during data analysis.</p>
 
-        {findingRows.length > 0 ? (
+        {localData?.answers && Object.keys(localData.answers).length > 0 ? (
           <div className="bg-white rounded-lg border border-[#E4E4E7] overflow-x-auto">
             <table className="w-full text-left text-body-sm">
               <thead className="border-b border-[#E4E4E7]">
                 <tr>
-                  <th className="px-4 py-3 text-label-md text-[#666] font-semibold w-[100px]">Category</th>
-                  <th className="px-4 py-3 text-label-md text-[#666] font-semibold">Endpoint</th>
-                  <th className="px-4 py-3 text-label-md text-[#666] font-semibold">Documented</th>
-                  <th className="px-4 py-3 text-label-md text-[#666] font-semibold">Actual</th>
-                  <th className="px-4 py-3 text-label-md text-[#666] font-semibold">Impact</th>
+                  <th className="px-4 py-3 text-label-md text-[#666] font-semibold w-1/3">Metric</th>
+                  <th className="px-4 py-3 text-label-md text-[#666] font-semibold">Value</th>
                 </tr>
               </thead>
               <tbody>
-                {findingRows.map((row, i) => (
-                  <tr key={i} className="border-b border-[#E4E4E7] last:border-0 hover:bg-[#F8F8F8] transition-colors">
-                    <td className="px-4 py-3">
-                      <span className={`text-label-sm rounded-full px-2.5 py-0.5 ${categoryColor(row.category)}`}>
-                        {row.category || "general"}
-                      </span>
+                {Object.entries(localData.answers).map(([key, val]) => (
+                  <tr key={key} className="border-b border-[#E4E4E7] last:border-0 hover:bg-[#F8F8F8]">
+                    <td className="px-4 py-3 text-[#666] align-top font-mono text-body-sm">
+                      {key.replace(/_/g, ' ')}
                     </td>
-                    <td className="px-4 py-3 text-[#303030] font-mono text-body-sm max-w-[180px] truncate">
-                      {row.endpoint || row.detail || "—"}
+                    <td className="px-4 py-3 text-[#303030] align-top">
+                      {typeof val === "object" ? JSON.stringify(val, null, 2) : String(val)}
                     </td>
-                    <td className="px-4 py-3 text-[#666] max-w-[200px]">{row.documented ?? "—"}</td>
-                    <td className="px-4 py-3 text-[#303030] max-w-[200px]">{row.actual ?? "—"}</td>
-                    <td className="px-4 py-3 text-[#666] max-w-[180px]">{row.impact ?? "—"}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         ) : (
-          // Fallback: show answers JSON as a readable key-value table
-          localData?.answers && Object.keys(localData.answers).length > 0 ? (
-            <div className="bg-white rounded-lg border border-[#E4E4E7] overflow-x-auto">
-              <table className="w-full text-left text-body-sm">
-                <thead className="border-b border-[#E4E4E7]">
-                  <tr>
-                    <th className="px-4 py-3 text-label-md text-[#666] font-semibold w-1/3">Question</th>
-                    <th className="px-4 py-3 text-label-md text-[#666] font-semibold">Finding</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Object.entries(localData.answers).map(([key, val]) => (
-                    <tr key={key} className="border-b border-[#E4E4E7] last:border-0 hover:bg-[#F8F8F8]">
-                      <td className="px-4 py-3 text-[#666] align-top font-mono text-body-sm">{key}</td>
-                      <td className="px-4 py-3 text-[#303030] align-top">
-                        {typeof val === "object" ? JSON.stringify(val, null, 2) : String(val)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <p className="text-body-md text-[#666]">No findings data available. Add findings to <code className="text-body-sm bg-[#F8F8F8] px-1.5 py-0.5 rounded">data/findings.json</code>.</p>
-          )
+          <p className="text-body-md text-[#666]">No data discoveries available.</p>
         )}
       </section>
     </div>
