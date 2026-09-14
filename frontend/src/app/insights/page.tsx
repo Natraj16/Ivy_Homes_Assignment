@@ -179,21 +179,37 @@ export default function Insights() {
             <table className="w-full text-left text-body-sm">
               <thead className="border-b border-[#E4E4E7]">
                 <tr>
-                  <th className="px-4 py-3 text-label-md text-[#666] font-semibold w-1/3">Metric</th>
-                  <th className="px-4 py-3 text-label-md text-[#666] font-semibold">Value</th>
+                  <th className="px-4 py-3 text-label-md text-[#666] font-semibold w-1/3">Question</th>
+                  <th className="px-4 py-3 text-label-md text-[#666] font-semibold">Answer</th>
                 </tr>
               </thead>
               <tbody>
-                {Object.entries(localData.answers).map(([key, val]) => (
-                  <tr key={key} className="border-b border-[#E4E4E7] last:border-0 hover:bg-[#F8F8F8]">
-                    <td className="px-4 py-3 text-[#666] align-top font-mono text-body-sm">
-                      {key.replace(/_/g, ' ')}
-                    </td>
-                    <td className="px-4 py-3 text-[#303030] align-top">
-                      {typeof val === "object" ? JSON.stringify(val, null, 2) : String(val)}
-                    </td>
-                  </tr>
-                ))}
+                {Object.entries(localData.answers).map(([key, val]) => {
+                  const QUESTION_MAP: Record<string, string> = {
+                    total_listing_records: "How many total listing records are there?",
+                    unique_properties: "How many unique physical properties do those records describe?",
+                    active_listings: "How many listings are currently active?",
+                    corrupt_listing_ids: "Which listing IDs contain physically impossible values?",
+                    total_monthly_rent: "What is the total monthly rent of all active rental listings?",
+                    avg_price_per_sqft_2bhk: "What is the average price per square foot for a 2BHK?",
+                    costliest_project: "What is the ID and max price of the most expensive project?",
+                    listings_last_7_days: "How many listings were added in the last 7 days?",
+                    fake_listing_ids: "Which listing IDs appear to be deliberately fake?",
+                    projects_with_wrong_listing_count: "How many projects have an incorrect listing count?"
+                  };
+                  return (
+                    <tr key={key} className="border-b border-[#E4E4E7] last:border-0 hover:bg-[#F8F8F8]">
+                      <td className="px-4 py-3 text-[#666] align-top text-body-sm pr-6">
+                        {QUESTION_MAP[key] || key.replace(/_/g, ' ')}
+                      </td>
+                      <td className="px-4 py-3 text-[#303030] align-top">
+                        {typeof val === "object" ? (
+                          <pre className="font-mono text-xs whitespace-pre-wrap">{JSON.stringify(val, null, 2)}</pre>
+                        ) : String(val)}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
