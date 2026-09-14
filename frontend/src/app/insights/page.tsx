@@ -3,11 +3,11 @@
 import { useState, useEffect } from "react";
 import { fetchApi } from "@/lib/api";
 
-function StatBlock({ value, label }: { value: string; label: string }) {
+function StatBlock({ value, label }: { value: string | React.ReactNode; label: string }) {
   return (
     <div className="flex flex-col gap-1 min-w-[120px]">
-      <span className="text-headline-md text-[#0018A8] font-bold">{value}</span>
       <span className="text-label-sm text-[#666] uppercase tracking-wider">{label}</span>
+      <span className="text-headline-md text-[#0018A8] font-bold capitalize">{value}</span>
     </div>
   );
 }
@@ -79,7 +79,7 @@ export default function Insights() {
   );
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-12 pb-12">
       <div>
         <h1 className="text-headline-md text-[#303030]">Insights</h1>
         <p className="text-body-sm text-[#666] mt-0.5">Market analytics and API findings.</p>
@@ -96,8 +96,8 @@ export default function Insights() {
         <h2 className="text-headline-sm text-[#303030]">Market summary</h2>
 
         {summary ? (
-          <div className="bg-white rounded-lg border border-[#E4E4E7] px-6 py-5">
-            <div className="flex flex-wrap gap-x-8 gap-y-5 items-start">
+          <div className="bg-white rounded-lg border border-[#E4E4E7] px-6 py-6">
+            <div className="flex flex-wrap gap-x-12 gap-y-6 items-start">
               {summary.city && <><StatBlock value={summary.city} label="City" /><Divider /></>}
               {summary.total_listings != null && <><StatBlock value={summary.total_listings.toLocaleString()} label="Total listings" /><Divider /></>}
               {summary.median_price != null && (
@@ -108,26 +108,26 @@ export default function Insights() {
               )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6 pt-5 border-t border-[#E4E4E7]">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mt-8 pt-6 border-t border-[#E4E4E7]">
               {/* By-locality breakdown */}
               {summary.by_locality && summary.by_locality.length > 0 && (
                 <div>
-                  <p className="text-label-md text-[#666] mb-3">By locality</p>
+                  <p className="text-label-md text-[#666] mb-4 font-medium">By locality</p>
                   <div className="overflow-x-auto">
                     <table className="w-full text-left text-body-sm">
                       <thead>
                         <tr className="border-b border-[#E4E4E7]">
-                          <th className="pb-2 text-label-md text-[#666] font-semibold pr-6">Locality</th>
-                          <th className="pb-2 text-label-md text-[#666] font-semibold pr-6">Count</th>
-                          <th className="pb-2 text-label-md text-[#666] font-semibold">Median price</th>
+                          <th className="pb-3 text-label-sm text-[#666] uppercase tracking-wider font-semibold pr-6">Locality</th>
+                          <th className="pb-3 text-label-sm text-[#666] uppercase tracking-wider font-semibold pr-6">Count</th>
+                          <th className="pb-3 text-label-sm text-[#666] uppercase tracking-wider font-semibold">Median price</th>
                         </tr>
                       </thead>
                       <tbody>
                         {summary.by_locality.slice(0, 10).map((loc: any) => (
-                          <tr key={loc.locality} className="border-b border-[#E4E4E7] last:border-0">
-                            <td className="py-2.5 pr-6 text-[#303030] capitalize">{loc.locality}</td>
-                            <td className="py-2.5 pr-6 text-[#303030]">{loc.count.toLocaleString()}</td>
-                            <td className="py-2.5 text-[#303030]">
+                          <tr key={loc.locality} className="border-b border-[#E4E4E7] last:border-0 hover:bg-[#F8F8F8] transition-colors">
+                            <td className="py-3 pr-6 text-[#303030] capitalize">{loc.locality}</td>
+                            <td className="py-3 pr-6 text-[#303030]">{loc.count.toLocaleString()}</td>
+                            <td className="py-3 text-[#303030]">
                               {loc.median_price ? `₹ ${(loc.median_price / 10000000).toFixed(2)} Cr` : "—"}
                             </td>
                           </tr>
@@ -141,20 +141,20 @@ export default function Insights() {
               {/* By-bedroom breakdown */}
               {summary.by_bhk && summary.by_bhk.length > 0 && (
                 <div>
-                  <p className="text-label-md text-[#666] mb-3">By bedrooms</p>
+                  <p className="text-label-md text-[#666] mb-4 font-medium">By bedrooms</p>
                   <div className="overflow-x-auto">
                     <table className="w-full text-left text-body-sm">
                       <thead>
                         <tr className="border-b border-[#E4E4E7]">
-                          <th className="pb-2 text-label-md text-[#666] font-semibold pr-6">BHK</th>
-                          <th className="pb-2 text-label-md text-[#666] font-semibold">Count</th>
+                          <th className="pb-3 text-label-sm text-[#666] uppercase tracking-wider font-semibold pr-6">BHK</th>
+                          <th className="pb-3 text-label-sm text-[#666] uppercase tracking-wider font-semibold">Count</th>
                         </tr>
                       </thead>
                       <tbody>
                         {summary.by_bhk.map((stats: any) => (
-                          <tr key={stats.bedroom} className="border-b border-[#E4E4E7] last:border-0">
-                            <td className="py-2.5 pr-6 text-[#303030]">{stats.bedroom} BHK</td>
-                            <td className="py-2.5 text-[#303030]">{stats.count.toLocaleString()}</td>
+                          <tr key={stats.bedroom} className="border-b border-[#E4E4E7] last:border-0 hover:bg-[#F8F8F8] transition-colors">
+                            <td className="py-3 pr-6 text-[#303030]">{stats.bedroom} BHK</td>
+                            <td className="py-3 text-[#303030]">{stats.count.toLocaleString()}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -165,22 +165,26 @@ export default function Insights() {
             </div>
           </div>
         ) : (
-          <p className="text-body-md text-[#666]">No summary data available.</p>
+          <div className="bg-white rounded-lg border border-[#E4E4E7] px-6 py-12 text-center">
+            <p className="text-body-md text-[#666]">No summary data available.</p>
+          </div>
         )}
       </section>
 
       {/* Section B: Data Discoveries */}
       <section className="flex flex-col gap-4">
-        <h2 className="text-headline-sm text-[#303030]">Data discoveries</h2>
-        <p className="text-body-sm text-[#666]">Additional insights and anomalies discovered during data analysis.</p>
+        <div>
+          <h2 className="text-headline-sm text-[#303030]">Data discoveries</h2>
+          <p className="text-body-sm text-[#666] mt-1">Additional insights and anomalies discovered during data analysis.</p>
+        </div>
 
         {localData?.answers && Object.keys(localData.answers).length > 0 ? (
-          <div className="bg-white rounded-lg border border-[#E4E4E7] overflow-x-auto">
+          <div className="bg-white rounded-lg border border-[#E4E4E7] overflow-x-auto mt-2">
             <table className="w-full text-left text-body-sm">
-              <thead className="border-b border-[#E4E4E7]">
+              <thead className="border-b border-[#E4E4E7] bg-[#F8F8F8]">
                 <tr>
-                  <th className="px-4 py-3 text-label-md text-[#666] font-semibold w-1/3">Question</th>
-                  <th className="px-4 py-3 text-label-md text-[#666] font-semibold">Answer</th>
+                  <th className="px-6 py-4 text-label-sm text-[#666] uppercase tracking-wider font-semibold w-1/3">Question</th>
+                  <th className="px-6 py-4 text-label-sm text-[#666] uppercase tracking-wider font-semibold">Answer</th>
                 </tr>
               </thead>
               <tbody>
@@ -198,13 +202,13 @@ export default function Insights() {
                     projects_with_wrong_listing_count: "How many projects have an incorrect listing count?"
                   };
                   return (
-                    <tr key={key} className="border-b border-[#E4E4E7] last:border-0 hover:bg-[#F8F8F8]">
-                      <td className="px-4 py-3 text-[#666] align-top text-body-sm pr-6">
+                    <tr key={key} className="border-b border-[#E4E4E7] last:border-0 hover:bg-[#F4F6FF] transition-colors">
+                      <td className="px-6 py-4 text-[#666] align-top text-body-sm pr-6">
                         {QUESTION_MAP[key] || key.replace(/_/g, ' ')}
                       </td>
-                      <td className="px-4 py-3 text-[#303030] align-top">
+                      <td className="px-6 py-4 text-[#303030] align-top">
                         {typeof val === "object" ? (
-                          <pre className="font-mono text-xs whitespace-pre-wrap">{JSON.stringify(val, null, 2)}</pre>
+                          <pre className="font-mono text-xs whitespace-pre-wrap bg-[#F8F8F8] p-2 rounded border border-[#E4E4E7]">{JSON.stringify(val, null, 2)}</pre>
                         ) : String(val)}
                       </td>
                     </tr>
@@ -214,7 +218,9 @@ export default function Insights() {
             </table>
           </div>
         ) : (
-          <p className="text-body-md text-[#666]">No data discoveries available.</p>
+          <div className="bg-white rounded-lg border border-[#E4E4E7] px-6 py-12 text-center mt-2">
+            <p className="text-body-md text-[#666]">No data discoveries available yet. Run the analysis scripts to populate.</p>
+          </div>
         )}
       </section>
     </div>
