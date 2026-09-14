@@ -93,3 +93,12 @@ The following differences were found between `API_REFERENCE.md` and the actual A
 | 8 | `/v1/listings` | duplicates | Every listing_id is globally unique, one physical property. | Listings contain duplicates describing the identical physical property. | Analysis of the data revealed multiple identical records. |
 | 9 | `/v1/listings` | data_quality | N/A | Certain listings have physically impossible values (e.g., floor > total). | Compared floor vs total_floors across all listings (6 violations). |
 | 10 | `/v1/listings` | fraud | N/A | Several listings are fake or fraudulently submitted. | Detected 6 fake listing_ids during deep analysis. |
+
+---
+
+## AI & Tools Used
+
+As permitted and encouraged by the assignment guidelines, this project was developed with the assistance of LLMs to accelerate boilerplate generation, data analysis, and UI styling:
+- **Claude**: Used for high-level planning and architecting the approach to the assignment, specifically strategizing how to safely probe the API, scrape the data, identify documentation discrepancies, and compute the required answers.
+- **Google DeepMind Antigravity**: Used as an agentic coding assistant to pair-program the Next.js frontend, refactor the UI to match the Ditto aesthetic tokens, and execute Python data analysis scripts.
+- **Python**: Used in isolated scripts to probe the API for rate limits, pagination maximums, and data anomalies (like duplicates and physically impossible values).
