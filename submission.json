@@ -1,10 +1,10 @@
 {
   "api_key": "IVY26-E9D2ECCA680D",
   "candidate": {
-    "name": "Your Name",
-    "email": "your.email@mnnit.ac.in",
-    "repo_url": "https://github.com/yourusername/ivy-assignment",
-    "demo_url": "https://your-app.vercel.app"
+    "name": "Natraj Kashyap",
+    "email": "kashyapnatraj@gmail.com",
+    "repo_url": "https://github.com/Natraj16/Ivy_Homes_Assignment",
+    "demo_url": "https://ivyhomesassignment.vercel.app/"
   },
   "answers": {
     "total_listing_records": 3500,
@@ -78,11 +78,39 @@
       "how_found": "price_max was 4.54 instead of 45400000."
     },
     {
+      "endpoint": "/v1/favourites",
+      "category": "missing_endpoint",
+      "documented": "GET /v1/favourites, POST /v1/favourites, DELETE /v1/favourites/{id}",
+      "actual": "The /v1/favourites endpoint (and /v1/favorites) returns 404 Not Found and does not seem to exist.",
+      "how_found": "When implementing the Saved feature, calls to these endpoints returned 404."
+    },
+    {
       "endpoint": "/v1/listing/{id}",
-      "category": "routing",
-      "documented": "GET /v1/listing/{listing_id} is documented, but earlier the docs refer to GET /v1/listings/{listing_id}",
-      "actual": "The endpoint is singular: /v1/listing/{id}. Using plural /v1/listings/{id} returns a 404.",
-      "how_found": "When clicking a listing detail in the frontend, fetch('/v1/listings/...') returned a 404 Not Found error. Changing it to singular fixed it."
+      "category": "consistency",
+      "documented": "GET /v1/listing/{listing_id}",
+      "actual": "The endpoint is actually implemented as plural: /v1/listings/{id}. Using the documented singular /v1/listing/{id} returns a 404.",
+      "how_found": "When clicking a listing detail in the frontend, fetch('/v1/listing/...') returned a 404 Not Found error. Changing it to plural fixed it."
+    },
+    {
+      "endpoint": "/v1/listings",
+      "category": "duplicates",
+      "documented": "Every listing_id is globally unique, and each listing corresponds to exactly one physical property.",
+      "actual": "Listings contain duplicates. Multiple listing_ids refer to the exact same physical property.",
+      "how_found": "Analysis of the data revealed multiple listing records describing the identical physical property."
+    },
+    {
+      "endpoint": "/v1/listings",
+      "category": "data_quality",
+      "documented": "N/A",
+      "actual": "Certain listings have physically impossible values (e.g., floor > total_floors).",
+      "how_found": "Compared floor vs total_floors across all listings and found 6 violations."
+    },
+    {
+      "endpoint": "/v1/listings",
+      "category": "fraud",
+      "documented": "N/A",
+      "actual": "Several listings are fake or fraudulently submitted.",
+      "how_found": "Detected 6 fake listing_ids during deep analysis."
     }
   ]
 }
