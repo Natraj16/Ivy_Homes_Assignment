@@ -45,7 +45,7 @@ export default function Listings() {
   });
 
   return (
-    <div className="flex flex-col md:flex-row gap-7 items-start">
+    <div className="flex flex-col md:flex-row-reverse gap-7 items-start">
       {/* Sidebar */}
       <aside className="w-full md:w-[260px] shrink-0 bg-[var(--color-meadow)] rounded-[var(--radius-card)] p-6 flex flex-col gap-5 md:sticky md:top-[100px]">
         <p className="text-label-sm text-[var(--color-muted)] flex items-center">
@@ -99,7 +99,7 @@ export default function Listings() {
           <EmptyState message="No listings match your filters." />
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               {filtered.map((listing) => (
                 <PropertyCard
                   key={listing.listing_id}

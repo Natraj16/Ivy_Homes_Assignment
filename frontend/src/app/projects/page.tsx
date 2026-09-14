@@ -26,7 +26,7 @@ export default function Projects() {
     setFilters((f) => ({ ...f, [k]: e.target.value }));
 
   return (
-    <div className="flex flex-col md:flex-row gap-7 items-start">
+    <div className="flex flex-col md:flex-row-reverse gap-7 items-start">
       <aside className="w-full md:w-[260px] shrink-0 bg-[var(--color-meadow)] rounded-[var(--radius-card)] p-6 flex flex-col gap-5 md:sticky md:top-[100px]">
         <p className="text-label-sm text-[var(--color-muted)] flex items-center">
           Filters {activeCount > 0 && <span className="bg-[var(--color-primary)] text-white rounded-full px-2 py-[1px] ml-1.5 text-[10px] leading-tight">{activeCount}</span>}
@@ -56,12 +56,12 @@ export default function Projects() {
           <div className="py-20 px-6 text-center"><p className="text-[15px] text-[var(--color-muted)]">No projects match your filters.</p></div>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               {filtered.map((p) => (
                 <PropertyCard key={p.project_id} id={p.project_id} type="project"
                   title={`${p.developer_name || ""} ${p.apartment_name || ""}`.trim()}
                   locality={p.locality || "Bangalore"}
-                  price={p.price_min ? `₹ ${(p.price_min / 10000000).toFixed(1)} – ${(p.price_max / 10000000).toFixed(1)} Cr` : "Price on request"}
+                  price={p.price_min ? `₹ ${Number(p.price_min).toFixed(2)} – ${Number(p.price_max).toFixed(2)} Cr` : "Price on request"}
                   beds="" baths="" area={p.total_units ? `${p.total_units} units` : ""} />
               ))}
             </div>

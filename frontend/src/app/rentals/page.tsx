@@ -28,7 +28,7 @@ export default function Rentals() {
     setFilters((f) => ({ ...f, [k]: e.target.value }));
 
   return (
-    <div className="flex flex-col md:flex-row gap-7 items-start">
+    <div className="flex flex-col md:flex-row-reverse gap-7 items-start">
       <aside className="w-full md:w-[260px] shrink-0 bg-[var(--color-meadow)] rounded-[var(--radius-card)] p-6 flex flex-col gap-5 md:sticky md:top-[100px]">
         <p className="text-label-sm text-[var(--color-muted)] flex items-center">
           Filters {activeCount > 0 && <span className="bg-[var(--color-primary)] text-white rounded-full px-2 py-[1px] ml-1.5 text-[10px] leading-tight">{activeCount}</span>}
@@ -63,7 +63,7 @@ export default function Rentals() {
           <div className="py-20 px-6 text-center"><p className="text-[15px] text-[var(--color-muted)]">No rentals match your filters.</p></div>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               {filtered.map((r) => (
                 <PropertyCard key={r.listing_id} id={r.listing_id} type="rental"
                   title={r.title || `${r.bedroom} BHK Rental`}
