@@ -1,6 +1,25 @@
-import Link from "next/link";
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { isAuthenticated } from "@/lib/auth";
 
 export default function Home() {
+  const router = useRouter();
+  const [authed, setAuthed] = useState(false);
+
+  useEffect(() => {
+    setAuthed(isAuthenticated());
+  }, []);
+
+  const handleNavigate = (targetPath: string) => {
+    if (isAuthenticated()) {
+      router.push(targetPath);
+    } else {
+      router.push(`/login?redirect=${encodeURIComponent(targetPath)}`);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-12 py-8 max-w-5xl mx-auto w-full">
       {/* Hero Section */}
@@ -16,33 +35,33 @@ export default function Home() {
         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-3 mt-4">
-          <Link
-            href="/listings"
-            className="rounded-md bg-zinc-900 text-white dark:bg-zinc-100 dark:text-black px-5 py-2.5 text-sm font-medium hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors"
+          <button
+            onClick={() => handleNavigate("/listings")}
+            className="rounded-md bg-zinc-900 text-white dark:bg-zinc-100 dark:text-black px-5 py-2.5 text-sm font-medium hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors cursor-pointer"
           >
             Browse Listings
-          </Link>
-          <Link
-            href="/rentals"
-            className="rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 px-5 py-2.5 text-sm font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+          </button>
+          <button
+            onClick={() => handleNavigate("/rentals")}
+            className="rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 px-5 py-2.5 text-sm font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
           >
             Explore Rentals
-          </Link>
-          <Link
-            href="/insights"
-            className="rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 px-5 py-2.5 text-sm font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+          </button>
+          <button
+            onClick={() => handleNavigate("/insights")}
+            className="rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 px-5 py-2.5 text-sm font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
           >
             Market Insights
-          </Link>
+          </button>
         </div>
       </section>
 
       {/* Explore Grid */}
       <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Listings Card */}
-        <Link
-          href="/listings"
-          className="group rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 flex flex-col justify-between hover:border-zinc-400 dark:hover:border-zinc-600 transition-colors shadow-xs"
+        <div
+          onClick={() => handleNavigate("/listings")}
+          className="group rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 flex flex-col justify-between hover:border-zinc-400 dark:hover:border-zinc-600 transition-colors shadow-xs cursor-pointer"
         >
           <div>
             <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mb-4 text-zinc-700 dark:text-zinc-300">
@@ -58,14 +77,14 @@ export default function Home() {
             </p>
           </div>
           <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300 mt-6 inline-flex items-center gap-1">
-            View listings →
+            {authed ? "View listings →" : "Sign in to view listings →"}
           </span>
-        </Link>
+        </div>
 
         {/* Rentals Card */}
-        <Link
-          href="/rentals"
-          className="group rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 flex flex-col justify-between hover:border-zinc-400 dark:hover:border-zinc-600 transition-colors shadow-xs"
+        <div
+          onClick={() => handleNavigate("/rentals")}
+          className="group rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 flex flex-col justify-between hover:border-zinc-400 dark:hover:border-zinc-600 transition-colors shadow-xs cursor-pointer"
         >
           <div>
             <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mb-4 text-zinc-700 dark:text-zinc-300">
@@ -81,14 +100,14 @@ export default function Home() {
             </p>
           </div>
           <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300 mt-6 inline-flex items-center gap-1">
-            View rentals →
+            {authed ? "View rentals →" : "Sign in to view rentals →"}
           </span>
-        </Link>
+        </div>
 
         {/* Projects Card */}
-        <Link
-          href="/projects"
-          className="group rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 flex flex-col justify-between hover:border-zinc-400 dark:hover:border-zinc-600 transition-colors shadow-xs"
+        <div
+          onClick={() => handleNavigate("/projects")}
+          className="group rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 flex flex-col justify-between hover:border-zinc-400 dark:hover:border-zinc-600 transition-colors shadow-xs cursor-pointer"
         >
           <div>
             <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mb-4 text-zinc-700 dark:text-zinc-300">
@@ -104,14 +123,14 @@ export default function Home() {
             </p>
           </div>
           <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300 mt-6 inline-flex items-center gap-1">
-            View projects →
+            {authed ? "View projects →" : "Sign in to view projects →"}
           </span>
-        </Link>
+        </div>
 
         {/* Insights Card */}
-        <Link
-          href="/insights"
-          className="group rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 flex flex-col justify-between hover:border-zinc-400 dark:hover:border-zinc-600 transition-colors shadow-xs"
+        <div
+          onClick={() => handleNavigate("/insights")}
+          className="group rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 flex flex-col justify-between hover:border-zinc-400 dark:hover:border-zinc-600 transition-colors shadow-xs cursor-pointer"
         >
           <div>
             <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mb-4 text-zinc-700 dark:text-zinc-300">
@@ -123,13 +142,13 @@ export default function Home() {
               Analytics & Insights
             </h2>
             <p className="text-sm text-zinc-500 mt-1">
-              Analyze median property rates, locality distributions, price per sqft metrics, and data discoveries.
+              Analyze median property rates, locality distributions, price per sqft metrics, and market findings.
             </p>
           </div>
           <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300 mt-6 inline-flex items-center gap-1">
-            View analytics →
+            {authed ? "View analytics →" : "Sign in to view analytics →"}
           </span>
-        </Link>
+        </div>
       </section>
 
       {/* Highlights Bar */}
